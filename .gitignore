@@ -102,12 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-.idea/vcs.xml
-.idea/modules.xml
-.idea/misc.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/dictionaries/Liron.xml
-.idea/AccessibleCourtData.iml
 tryout.ipynb
 Scrapy TODO List.txt
 myjson.json
@@ -117,3 +111,5 @@ Data Cleaning.txt
 products/indexes_5_5_3.txt
 *.log.*
 *.out
+
+.idea/
