@@ -3,7 +3,7 @@
 
 # Installation
 ```
-$ git clone https://github.com/Immanuelbh/AccessibleCourtData.git
+$ git clone https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
 ```
 
 # Thank you
