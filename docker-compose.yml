@@ -12,35 +12,33 @@ services:
         - 9300:9300
       networks:
         - elknetwork
+
     kibana:
       image: kibana:5.5.2
       container_name: kibana
       hostname: kibana
       ports:
-      - 5601:5601
+        - 5601:5601
       links:
         - elasticsearch:elasticsearch
       depends_on:
         - elasticsearch
       networks:
         - elknetwork
+
     logstash:
       image: logstash:5.5.2
       container_name: logstash
       hostname: logstash
       ports:
-      - 9600:9600
-      - 8089:8089
-      environment:
-        LS_JAVA_OPTS: "-Xms256m -Xmx256m"
-      volumes:
-      - .\logstash:/usr/share/logstash/pipeline/
+        - 9600:9600
       links:
         - elasticsearch:elasticsearch
       depends_on:
         - elasticsearch
       networks:
         - elknetwork
+
 networks:
   elknetwork:
     driver: bridge
