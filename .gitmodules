@@ -1,0 +1,4 @@
+[submodule "env-set-up"]
+	path = env-set-up
+	url = https://github.com/Immanuelbh/HCVA-env-set-up.git
+    branch = release-5.x
