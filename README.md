@@ -1,11 +1,10 @@
 # Hebrew Court Verdicts Analyzer
 
-
 # Development
 ## Installation
 ### Clone project
 ```
-$ git clone https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
+$ git clone -b add-env --recurse-submodules https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
 $ cd HebrewCourtVerdictsAnalyzer/
 ```
 ### Install required modules
@@ -21,9 +20,35 @@ $ python3 -m venv venv
 $ venv\Scripts\activate.bat
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
-### Run local ELK stack
+### ELK stack
+#### Version
+Configured by changing the branch in the .gitmodules file.
 ```
-$ docker-compose up -d
+branch = release-5.x
+```
+Update to different version
+```
+$ git submodule update --remote
+```
+#### Commands
+##### Initialise
+```
+$ ./env/init_env.sh
+```
+
+##### Shutdown
+```
+$ ./env/shutdown_env.sh
+```
+### App
+#### Commands
+##### Run
+```
+$ ./init_app.sh
+```
+##### Shutdown
+```
+$ ./shutdown_app.sh
 ```
 
 
