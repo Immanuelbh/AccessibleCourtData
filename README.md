@@ -26,6 +26,10 @@ Configured by changing the branch in the .gitmodules file.
 ```
 branch = release-5.x
 ```
+Update to different version
+```
+$ git submodule update --remote
+```
 #### Commands
 ##### Initialise
 ```
