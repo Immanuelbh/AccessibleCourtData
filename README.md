@@ -29,12 +29,12 @@ branch = release-5.x
 #### Commands
 ##### Initialise
 ```
-$ ./init_env.sh
+$ ./env/init_env.sh
 ```
 
 ##### Shutdown
 ```
-$ ./shutdown_env.sh
+$ ./env/shutdown_env.sh
 ```
 ### App
 #### Commands
