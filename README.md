@@ -4,7 +4,7 @@
 ## Installation
 ### Clone project
 ```
-$ git clone -b add-env --recurse-submodules https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
+$ git clone --recurse-submodules https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
 $ cd HebrewCourtVerdictsAnalyzer/
 ```
 ### Install required modules
