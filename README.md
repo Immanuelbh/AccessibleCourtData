@@ -33,12 +33,14 @@ $ git submodule update --remote
 #### Commands
 ##### Initialise
 ```
-$ ./env/init_env.sh
+$ cd env/
+$ ./init_env.sh
 ```
 
 ##### Shutdown
 ```
-$ ./env/shutdown_env.sh
+$ cd env/
+$ ./shutdown_env.sh
 ```
 ### App
 #### Commands
