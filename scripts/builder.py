@@ -5,6 +5,19 @@ POST_ACTION = '_update'
 GET_ACTION = '_doc'
 
 
+def build_get_request_7_10_2(index, id):
+    payload = "{index}/{action}/{id}".format(index=index, action=GET_ACTION, id=id)
+    url = urljoin(URL, payload)
+    return url
+
+
+def build_post_request_7_10_2(json_file, index, id):
+    data_to_post = build_wrapper(json_file)
+    payload = "{index}/{action}/{id}".format(index=index, action=POST_ACTION, id=id)
+    url = urljoin(URL, payload)
+    return url, data_to_post
+
+
 def build_get_request_7_6(index, id):
     payload = "{index}/{action}/{id}".format(index=index, action=GET_ACTION, id=id)
     url = urljoin(URL, payload)
