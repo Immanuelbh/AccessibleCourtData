@@ -46,7 +46,7 @@ class Elastic_7_10_2:
         if self._schema:
             self.index_with_schema(list_of_products)
         else:
-            self.index_without_schema(list_of_products)
+            self.index_without_schema(list_of_products) # why index without schema?
         self._logger.info("The elastic posting process is over at this point")
 
     def index_with_schema(self, list_of_products):
