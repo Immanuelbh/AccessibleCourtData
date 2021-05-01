@@ -11,9 +11,9 @@ if __name__ == '__main__':
                  4: uploadSync,
                  5: downloadSync
                  }
+
     if len(sys.argv) > 1:
         choice = int(sys.argv[1])
-
     else:
         choice = int(input("Enter which function you want to run:\n"
                            "1: Supreme Court Scraper\n"
@@ -22,6 +22,10 @@ if __name__ == '__main__':
                            "4: Upload Sync\n"
                            "5: Download Sync\n"
                            ))
+
     if len(functions) >= choice > 0:
         func = functions[choice]
         func()
+
+
+print('DONE')
