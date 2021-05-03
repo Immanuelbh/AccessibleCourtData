@@ -15,11 +15,16 @@ class Scraper:
     def __init__(self, num_of_crawlers=0, site=None):
         logPath = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
         self.logger = Logger(f'{site}_Scraper.log', logPath).getLogger()
-        self.db = DB(logger=self.logger).getDB(site)
-        self.num_of_crawlers = min(cpu_count(), 4) if num_of_crawlers == 0 else num_of_crawlers  # 0 => 4 threads, else num
-        self.productsFolder = getPath(N=0) + f'products{sep}json_products{sep}'  # product path
-        self.backupFolder = getPath(N=0) + f'products{sep}backup_json_products{sep}'
-        createDir(self.productsFolder)
+        self.db = DB(logger=self.logger)
+        if self.db.client is not None:
+            self.db = self.db.getDB(site)
+            self.num_of_crawlers = min(cpu_count(), 4) if num_of_crawlers == 0 else num_of_crawlers
+            self.productsFolder = getPath(N=0) + f'products{sep}json_products{sep}'  # product path
+            self.backupFolder = getPath(N=0) + f'products{sep}backup_json_products{sep}'
+            createDir(self.productsFolder)
+        else:
+            print('err no db connection')
+
 
     # Functions
     def getNumOfCrawlers(self):
@@ -38,7 +43,8 @@ class Scraper:
                 return item[key]
 
         db.collection.insert({ "crawler Run": True })  # in case of first run
-        return self.getSettings(key)
+        # return self.getSettings(key)
+        return True
 
     def uploadData(self, name, data):
         try:
@@ -57,4 +63,6 @@ class Scraper:
     def start(self):
         with ThreadPoolExecutor() as executor:
             indexes = [index for index in range(1, self.getNumOfCrawlers() + 1)]
-            executor.map(self.start_crawler, indexes)
+            results = executor.map(self.start_crawler, indexes)
+        for result in results:
+            print(result)

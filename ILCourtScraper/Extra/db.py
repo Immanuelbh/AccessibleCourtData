@@ -2,6 +2,7 @@ from os import environ
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
+# DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
 DB_URI = environ.get('MONGO_DB_URI')
 
 
@@ -13,20 +14,23 @@ class DB:
 
     def get_connection(self):
         try:
+            self.log('db trying to connect...')
             connection = self.client
-            self.log('db establish connection')
-        except ServerSelectionTimeoutError as _:
+            self.log('db connected')
+            print('db ', self.client.list_database_names())
+        except ServerSelectionTimeoutError as err:
             message = 'db connection Timeout - check for if this machine ip is on whitelist'
             if self.logger is not None:
-                self.logger.exception(message)
+                self.logger.exception(message + err)
             else:
-                print(message)
+                print(message + err)
             connection = None
         return connection
 
     def getDB(self, dbName):
-        db = self.client.get_database(dbName)
-        self.log(f'got db: {dbName}')
+        self.log(f'db trying to get db: {dbName}')
+        db = self.client[dbName]
+        self.log(f'got db: {db.name}')
         return db
 
     def getCollection(self, db, collectionName):

@@ -344,9 +344,11 @@ class SupremeCourtScraper(Scraper):
 
     # input - index as int
     def start_crawler(self, index):
-        callSleep(seconds=index * 5)  # crawlers start in different times to ensure they don't take the same page
+        # callSleep(seconds=index * 5)  # crawlers start in different times to ensure they don't take the same page
+        self.logger.info('crawler attempting to start #' + str(index))
         crawler = None
         canIGO = self.getSettings('crawler Run')
+        self.logger.info('crawler canIGO:' + str(canIGO))
 
         while canIGO:
             crawler = Crawler(index=index, delay=2, site=self.site) if crawler is None else crawler
@@ -373,14 +375,15 @@ class SupremeCourtScraper(Scraper):
 
         if crawler is not None:
             crawler.close()
-        callSleep(minutes=10)
-        self.start_crawler(index=index)
+        return "done" + index
+        # callSleep(minutes=10)
+        # self.start_crawler(index=index)
 
 
 def main():
     scraper = SupremeCourtScraper()
-    #  scraper.start_crawler(1)  # run 1 crawler
-    scraper.start()  # run N crawlers
+    scraper.start_crawler(1)  # run 1 crawler
+    # scraper.start()  # run N crawlers
 
 
 # run scraper only if run directly from python and not from import

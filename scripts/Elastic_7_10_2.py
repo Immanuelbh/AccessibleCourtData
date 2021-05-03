@@ -1,24 +1,21 @@
 import sys
 sys.path.insert(1, './..')
 
-import os
-import json
 import glob
 import requests
 from time import sleep
 from scripts.builder import *
 from scripts.Moving import Moving
-from scripts.relative_path import *
 from scripts.json_validator import *
 from scripts.internet import *
 from ILCourtScraper.Extra.logger import Logger
 from ILCourtScraper.Extra.time import callSleep
-from ILCourtScraper.Extra.path import getPath, sep, createDir, changeDir, getFiles
+from ILCourtScraper.Extra.path import getPath, sep
 
 HEADERS = {"Content-Type": "application/json"}
 RULING_INDEX = 'supreme_court_rulings'
 HANDLED_JSON_PRODUCTS_PATH = "products/handled_json_products"
-INDEXES_FILE_LOCATION = "products/indexes_7_6.txt"
+INDEXES_FILE_LOCATION = "products/indexes_7_10_2.txt"
 NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE = 5
 THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME = 100
 DELAY_TIME_BETWEEN_ONE_REQUEST_AND_ANOTHER = 3  # In seconds
@@ -26,7 +23,7 @@ GET_REQUEST = "GET"
 POST_REQUEST = "POST"
 
 
-class Elastic_7_6:
+class Elastic_7_10_2:
     _logger = None
     _moving = None
     _schema = None
@@ -49,7 +46,7 @@ class Elastic_7_6:
         if self._schema:
             self.index_with_schema(list_of_products)
         else:
-            self.index_without_schema(list_of_products)
+            self.index_without_schema(list_of_products) # why index without schema?
         self._logger.info("The elastic posting process is over at this point")
 
     def index_with_schema(self, list_of_products):
@@ -217,7 +214,7 @@ class Elastic_7_6:
 
                 elasticsearch_id = build_elasticsearch_id(json_id=id_from_json)  # Build id to get and post request
                 self._logger.info("ID successfully built")
-                get_url = build_get_request_7_6(index=RULING_INDEX, id=elasticsearch_id)  # Build get request url
+                get_url = build_get_request_7_10_2(index=RULING_INDEX, id=elasticsearch_id)  # Build get request url
                 self._logger.info("Successfully built get request URL")
                 self.sleep_now()
                 get_result = self.send_get_request(url=get_url)  # Send get request
@@ -226,8 +223,8 @@ class Elastic_7_6:
 
                 if self.check_status_code(get_result, GET_REQUEST) is False and data_from_elastic['found'] is False:
                     # Build post request url and data
-                    post_url, post_data = build_post_request_7_6(json_file=json_data, index=RULING_INDEX,
-                                                             id=elasticsearch_id)
+                    post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
+                                                                 id=elasticsearch_id)
                     self._logger.info("Successfully built post request URL and data")
                     self.sleep_now()
                     post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
@@ -242,7 +239,7 @@ class Elastic_7_6:
                         "The result of comparison is: {result} ".format(result=the_result_of_the_comparison))
                     if the_result_of_the_comparison:
                         post_url, post_data = build_post_request_7_6(json_file=json_data, index=RULING_INDEX,
-                                                                 id=elasticsearch_id)
+                                                                     id=elasticsearch_id)
                         self.sleep_now()
                         post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
                         self._logger.info("POST request sent")
@@ -251,7 +248,7 @@ class Elastic_7_6:
                     else:
                         elasticsearch_id = rebuilding_id(elasticsearch_id)
                         self._logger.info("ID successfully rebuild")
-                        get_url = build_get_request_7_6(index=RULING_INDEX, id=elasticsearch_id)
+                        get_url = build_get_request_7_10_2(index=RULING_INDEX, id=elasticsearch_id)
                         self._logger.info("Successfully built get request URL")
                         self.sleep_now()
                         get_result = self.send_get_request(get_url)
@@ -259,8 +256,8 @@ class Elastic_7_6:
                         data_from_elastic = get_result.json()
 
                 if self.check_status_code(get_result, GET_REQUEST) is False and data_from_elastic['found'] is False:
-                    post_url, post_data = build_post_request_7_6(json_file=json_data, index=RULING_INDEX,
-                                                             id=elasticsearch_id)
+                    post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
+                                                                 id=elasticsearch_id)
                     self._logger.info("Successfully built post request URL and data")
                     self.sleep_now()
                     post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
@@ -279,9 +276,9 @@ class Elastic_7_6:
 
 
 def main():
-    _logger = Logger('elasticsearch.log', getPath(N=1) + f'logs{sep}').getLogger()
+    _logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
     while True:
-        Elastic_7_6(_logger).start_index()  # start index product to elastic DB
+        Elastic_7_10_2(_logger).start_index()  # start index product to elastic DB
         callSleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
