@@ -1,5 +1,5 @@
 import sys
-from scripts.Elastic_5_5_3 import main as elastic_main
+from scripts.Elastic_7_10_2 import main as elastic_main
 from ILCourtScraper.Parser.parser import main as parser_main
 from ILCourtScraper.Extra.sync import uploadSync, downloadSync
 from ILCourtScraper.Scrapers.SupremeCourt_Scraper import main as scraper_main
