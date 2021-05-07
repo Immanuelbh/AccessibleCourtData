@@ -2,8 +2,8 @@ from os import environ
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
-# DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
-DB_URI = environ.get('MONGO_DB_URI')
+DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
+# DB_URI = environ.get('MONGO_DB_URI')
 
 
 class DB:
