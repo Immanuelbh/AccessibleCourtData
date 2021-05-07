@@ -11,6 +11,7 @@ class Scraper:
     num_of_crawlers = None  # number of threads as well
     productsFolder = None  # product path as string
     logger = None
+    db_exists = False
 
     def __init__(self, num_of_crawlers=0, site=None):
         logPath = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
@@ -25,7 +26,6 @@ class Scraper:
         else:
             print('err no db connection')
 
-
     # Functions
     def getNumOfCrawlers(self):
         return self.num_of_crawlers
@@ -36,15 +36,17 @@ class Scraper:
         return f'{currTime()}_{index}.json'  # date_time_index.json
 
     def getSettings(self, key):
-        collection = self.db.get_collection('settings')
-        query = collection.find({})
-        for item in query:
-            if key in item:
-                return item[key]
-
-        db.collection.insert({ "crawler Run": True })  # in case of first run
-        # return self.getSettings(key)
-        return True
+        if self.db_exists:
+            collection = self.db.get_collection('settings')
+            query = collection.find({})
+            for item in query:
+                if key in item:
+                    return item[key]
+        else:
+            # first run
+            self.db.collection.insert({"crawler Run": True})
+            self.db_exists = True
+            return True
 
     def uploadData(self, name, data):
         try:
