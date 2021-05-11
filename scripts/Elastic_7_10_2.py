@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, './..')
 
 import glob
@@ -11,9 +12,12 @@ from scripts.internet import *
 from ILCourtScraper.Extra.logger import Logger
 from ILCourtScraper.Extra.time import callSleep
 from ILCourtScraper.Extra.path import getPath, sep
+from elasticsearch import Elasticsearch
+
 
 HEADERS = {"Content-Type": "application/json"}
-RULING_INDEX = 'supreme_court_rulings'
+RULING_INDEX = 'supreme_court_verdicts'
+TEST_INDEX = 'test_index_1'
 HANDLED_JSON_PRODUCTS_PATH = "products/handled_json_products"
 INDEXES_FILE_LOCATION = "products/indexes_7_10_2.txt"
 NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE = 5
@@ -21,6 +25,7 @@ THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME = 100
 DELAY_TIME_BETWEEN_ONE_REQUEST_AND_ANOTHER = 3  # In seconds
 GET_REQUEST = "GET"
 POST_REQUEST = "POST"
+PUT_REQUEST = "PUT"
 
 
 class Elastic_7_10_2:
@@ -31,7 +36,9 @@ class Elastic_7_10_2:
     _elk_id = None
     _elasticsearch_indexes_list = None
 
-    def __init__(self, logger=None, json_schema=True, the_amount_of_delivery=THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME):
+    def __init__(self, logger=None, json_schema=True,
+                 the_amount_of_delivery=THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME):
+        self.index_exists = False
         self._logger = logger
         self._moving = Moving()
         self._schema = json_schema
@@ -41,13 +48,27 @@ class Elastic_7_10_2:
     def start_index(self):
         self._logger.info("Start posting information into Elastic")
         directory = get_path(folder=HANDLED_JSON_PRODUCTS_PATH)
-        list_of_products = self.get_files_from_folder(folderName=directory)
+        list_of_products = self.get_files_from_folder(folder_name=directory)
         self._logger.info("Get all file from handled_json_products folder")
-        if self._schema:
-            self.index_with_schema(list_of_products)
+        self.index_exists = self.index_exists if True else self.create_index()
+        if self.index_exists:
+            if self._schema:
+                self.index_with_schema(list_of_products)
+            else:
+                self.index_without_schema(list_of_products)  # why index without schema?
         else:
-            self.index_without_schema(list_of_products) # why index without schema?
+            self._logger.info("Error creating index")
+
         self._logger.info("The elastic posting process is over at this point")
+
+    def create_index(self):
+        elastic = Elasticsearch()
+        if elastic.indices.exists(index=TEST_INDEX):
+            return True
+        else:
+            response = elastic.indices.create(index=TEST_INDEX)
+            if response:
+                return response.acknowledged
 
     def index_with_schema(self, list_of_products):
         for (idx, product) in enumerate(list_of_products, 1):
@@ -159,6 +180,9 @@ class Elastic_7_10_2:
             file.close()
         self._elasticsearch_indexes_list = list()
 
+    def send_request(self,  method, url, data):
+        return requests.request(method, url, data=json.dumps(data), auth=('elastic', 'changeme'), headers=HEADERS)
+
     def sent_post_request(self, url, datafile):
         return requests.post(url, data=json.dumps(datafile), auth=('elastic', 'changeme'), headers=HEADERS)
 
@@ -169,8 +193,8 @@ class Elastic_7_10_2:
             return True
         return False
 
-    def get_files_from_folder(self, folderName, fileType='json'):
-        return [f for f in glob.glob(folderName + os.sep + "*." + fileType)]
+    def get_files_from_folder(self, folder_name, file_type='json'):
+        return [f for f in glob.glob(folder_name + os.sep + "*." + file_type)]
 
     def send_get_request(self, url):
         return requests.get(url, auth=('elastic', 'changeme'))
@@ -224,7 +248,7 @@ class Elastic_7_10_2:
                 if self.check_status_code(get_result, GET_REQUEST) is False and data_from_elastic['found'] is False:
                     # Build post request url and data
                     post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
-                                                                 id=elasticsearch_id)
+                                                                    id=elasticsearch_id)
                     self._logger.info("Successfully built post request URL and data")
                     self.sleep_now()
                     post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
@@ -238,7 +262,7 @@ class Elastic_7_10_2:
                     self._logger.info(
                         "The result of comparison is: {result} ".format(result=the_result_of_the_comparison))
                     if the_result_of_the_comparison:
-                        post_url, post_data = build_post_request_7_6(json_file=json_data, index=RULING_INDEX,
+                        post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
                                                                      id=elasticsearch_id)
                         self.sleep_now()
                         post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
@@ -257,7 +281,7 @@ class Elastic_7_10_2:
 
                 if self.check_status_code(get_result, GET_REQUEST) is False and data_from_elastic['found'] is False:
                     post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
-                                                                 id=elasticsearch_id)
+                                                                    id=elasticsearch_id)
                     self._logger.info("Successfully built post request URL and data")
                     self.sleep_now()
                     post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
@@ -279,7 +303,8 @@ def main():
     _logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
     while True:
         Elastic_7_10_2(_logger).start_index()  # start index product to elastic DB
-        callSleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
+        callSleep(logger=_logger,
+                  minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
 if __name__ == '__main__':

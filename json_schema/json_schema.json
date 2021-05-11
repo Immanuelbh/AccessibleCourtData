@@ -1,7 +1,7 @@
 {
   "$schema":"http://json-schema.org/draft-07/schema#",
   "description":"validate json object",
-  "title":"supreme_court_rulings",
+  "title":"supreme_court_verdicts",
   "type":"object",
   "additionalProperties":true,
   "required":["Doc Details"],

@@ -36,3 +36,4 @@ wcwidth==0.2.5
 webdriver-manager==3.2.2
 wincertstore==0.2
 zipp==2.2.1
+
