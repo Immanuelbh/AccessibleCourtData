@@ -9,7 +9,7 @@ import shutil
 import sys
 sys.path.insert(1, './..')
 
-TEST_INDEX = 'test_index_1'
+ELASTIC_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)
 HANDLED_DIR = "/products/handled_json_products/"
 
@@ -47,13 +47,13 @@ class Elastic_7_10_2:
         self.elastic = Elasticsearch()
 
     def init_index(self):
-        self._logger.info("initializing elasticsearch index :: {}".format(TEST_INDEX))
-        if self.elastic.indices.exists(index=TEST_INDEX):
-            self._logger.info("{} index exists".format(TEST_INDEX))
+        self._logger.info("initializing elasticsearch index :: {}".format(ELASTIC_INDEX))
+        if self.elastic.indices.exists(index=ELASTIC_INDEX):
+            self._logger.info("{} index exists".format(ELASTIC_INDEX))
             return True
         else:
-            self._logger.info("creating index :: {} ".format(TEST_INDEX))
-            response = self.elastic.indices.create(index=TEST_INDEX)
+            self._logger.info("creating index :: {} ".format(ELASTIC_INDEX))
+            response = self.elastic.indices.create(index=ELASTIC_INDEX)
             if response:
                 return response['acknowledged']
             else:
@@ -103,7 +103,7 @@ class Elastic_7_10_2:
 
     def upload(self, id, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=TEST_INDEX, id=id, body=data)
+        res = self.elastic.index(index=ELASTIC_INDEX, id=id, body=data)
         self._logger.info("file {}".format(res['result']))
         return res
 
@@ -113,7 +113,7 @@ def main():
     elastic = Elastic_7_10_2(logger)
     index_created = elastic.init_index()
     if index_created:
-        print("{} index created successfully".format(TEST_INDEX))
+        print("{} index created successfully".format(ELASTIC_INDEX))
         while True:
             elastic.run()
             elastic.flush_all()
