@@ -41,10 +41,10 @@ def upToDateDB(db=None):
 
 
 # input - db as database, date as string, first as int, last as int, status as boolean
-def updateDateInDB(db, date, first, last, status, case_List):
+def update_date_in_db(db, date, first, last, status, case_list):
     collection = db.get_collection('dates')
     collection.update_one({'date': date},
-                          {"$set": {'first': first, 'last': last, 'is taken': status, 'case List': case_List}})
+                          {"$set": {'first': first, 'last': last, 'is taken': status, 'case List': case_list}})
 
 
 def resetDatesInDB(db):
@@ -54,18 +54,18 @@ def resetDatesInDB(db):
 
 # output - return list of links as list contain:
 #                           ({'date': string, first': int, 'last': int, 'is taken': boolean, 'case List': list})
-def getLinks(db):
+def get_links(db):
     if db is not None:  # use db
         upToDateDB(db)
         collection = db.get_collection('dates')
         dateList = list(collection.find({'is taken': False}).skip(0))
         if len(dateList) > 0:
             item = dateList[-1]  # last item from non taken dates
-            updateDateInDB(db, item['date'], item['first'], item['last'], True, item['case List'])
+            update_date_in_db(db, item['date'], item['first'], item['last'], True, item['case List'])
             return item
         else:
             resetDatesInDB(db)
-            return getLinks(db)
+            return get_links(db)
     else:
         print("Got None as db value")
 

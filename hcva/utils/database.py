@@ -6,8 +6,8 @@ DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
 # DB_URI = environ.get('MONGO_DB_URI')
 
 
-class DB:
-    def __init__(self, logger=None):
+class Database:
+    def __init__(self, logger):
         self.logger = logger
         self.client = MongoClient(DB_URI)
         self.get_connection()

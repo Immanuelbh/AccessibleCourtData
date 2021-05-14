@@ -1,4 +1,4 @@
-from hcva.utils.json import readData, saveData
+from hcva.utils.json import readData, save_data
 from hcva.utils.path import get_path, sep, getFiles, remove
 
 readFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
@@ -16,7 +16,7 @@ def fixSchema(doc):
 def moveFile(data, fileName, sourceFolder, destFolder):
     remove(fileName)  # delete old copy
     fileName = fileName.replace(sourceFolder, '')  # extract file name
-    saveData(data, fileName, destFolder)  # save new copy
+    save_data(data, fileName, destFolder)  # save new copy
 
 
 def run():

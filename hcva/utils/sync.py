@@ -1,7 +1,7 @@
-from hcva.utils.db import DB
+from hcva.utils.database import Database
 from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
-from hcva.utils.json import readData, saveData
+from hcva.utils.json import readData, save_data
 from hcva.utils.path import get_path, sep, getFiles, create_dir, changeDir
 
 
@@ -32,7 +32,7 @@ def fixData(name, data):
     if "ת.החלטה" in str(data):
         for item in data["Case Details"]["תיק דלמטה"]:
             item["תאריך החלטה"] = item.pop("ת.החלטה")
-        saveData(data, name, "")
+        save_data(data, name, "")
 
 
 def uploadSync(loop=True):
@@ -41,7 +41,7 @@ def uploadSync(loop=True):
         total = 0
         uCounter = 0
         sCounter = 0
-        db = DB().get_db('SupremeCourt')
+        db = Database().get_db('SupremeCourt')
 
         for folder in uploadFolders.keys():
             connection = db.get_collection(getFolderName(folder))
@@ -83,7 +83,7 @@ def downloadSync(loop=True):
     _logger = Logger('downloadSync.log', get_path(N=0) + f'logs{sep}').getLogger()
     while True:
         total = 0
-        db = DB().get_db('SupremeCourt')
+        db = Database().get_db('SupremeCourt')
         for folder in downloadFolders:
             counter = 0
             connection = db.get_collection(getFolderName(folder))
@@ -91,7 +91,7 @@ def downloadSync(loop=True):
             fileList = [file.replace(folder, '') for file in getFiles(folderPath=folder)]  # extract file name
             for file in cursor:
                 if file['name'] not in fileList:
-                    saveData(file['data'], file['name'], folder)
+                    save_data(file['data'], file['name'], folder)
                     counter += 1
             total += counter
             _logger.info(f"Total {counter} files ware downloaded into {folder}")

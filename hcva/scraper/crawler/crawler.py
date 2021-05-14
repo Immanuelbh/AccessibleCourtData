@@ -17,31 +17,29 @@ ROOT_DIR = os.path.abspath(os.curdir)
 
 class Crawler:
     _driver = None  # Web Driver
-    _delay = None  # Timer for finding web element as int
+    _delay = 2  # Timer for finding web element as int
     _url = None  # starting page as string
     _text_query = None  # latest text scrape as string
     _logger = None  # logging log class
 
-    def __init__(self, id_=1, delay=2):
-        log_path = ROOT_DIR + 'logs/hcva/'
+    def __init__(self, id_=1):
+        log_path = ROOT_DIR + '/logs/hcva/'
         self._logger = Logger(f'crawler_{id_}.log', log_path).getLogger()
         self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
-        self.update_delay(delay)  # update delay
         # self.update_page(url)  # open url
         self._logger.info('crawler created')
 
     # Functions
     @staticmethod
     def get_browser(browser='chrome'):
-        path = f'ILCourtScraper{sep}WebDrivers{sep}'
         if browser == 'chrome':
             return webdriver.Chrome(ChromeDriverManager().install())
         elif browser == 'firefox':
             return webdriver.Firefox(GeckoDriverManager().install())
         elif browser == 'edge':
             if system() == 'Windows':
-                return webdriver.Edge(executable_path=get_path(N=0) + path + 'msedgedriver.exe')
+                return webdriver.Edge(executable_path=ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
 
     # input - update as boolean
     # output - return string if true, else None
@@ -51,16 +49,6 @@ class Crawler:
             return self._text_query
         else:
             return None
-
-    # input - delay as int
-    # do - change the main delay for the crawler
-    def update_delay(self, delay=1):
-        if type(delay) is int:
-            self._delay = delay
-            message = f'Delay change to: {delay}'
-        else:
-            message = 'Delay input was not int'
-        self._logger.info(message)
 
     # input - url as string
     # output - return true if succeed else false

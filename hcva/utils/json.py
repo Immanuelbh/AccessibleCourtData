@@ -4,7 +4,7 @@ from hcva.utils.path import get_path
 from hcva.utils.time import currTime
 
 
-def saveData(data, fileName=None, filePath=None):
+def save_data(data, fileName=None, filePath=None):
     fileName = f"dataFromScraper_{currTime()}" if fileName is None else fileName
     filePath = get_path() if filePath is None else filePath
     with open(filePath + fileName, 'w') as outfile:
