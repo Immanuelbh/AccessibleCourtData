@@ -13,6 +13,29 @@ TEST_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)
 HANDLED_DIR = "/products/handled_json_products/"
 
+
+def get_source(file_name):
+    source = ROOT_DIR + HANDLED_DIR + file_name
+    return source
+
+
+def get_destination(directory):
+    destination = ROOT_DIR + "/products/" + directory
+    os.makedirs(destination, exist_ok=True)
+    return destination
+
+
+def flush(files, directory):
+    destination = get_destination(directory)
+    for file in files:
+        source = get_source(file)
+        shutil.move(source, destination)
+
+
+def get_all_files(folder_name):
+    return [f for f in glob.glob(folder_name + "/*.json")]
+
+
 class Elastic_7_10_2:
     failed_upload = []
     failed_validation = []
@@ -37,31 +60,15 @@ class Elastic_7_10_2:
                 self._logger.error("Error creating index")
 
     def run(self):
-        directory = get_path(folder="products/handled_json_products")
-        products = self.get_all_files(folder_name=directory)
+        products = get_all_files(folder_name=ROOT_DIR + HANDLED_DIR)
         self.index_with_schema(products)
 
     def flush_all(self):
         self._logger.info("flushing folder")
-        self.flush(self.success_upload, "elastic/success_upload")
-        self.flush(self.failed_upload, "elastic/failed_upload")
-        self.flush(self.failed_validation, "elastic/failed_validation")
+        flush(self.success_upload, "elastic/success_upload")
+        flush(self.failed_upload, "elastic/failed_upload")
+        flush(self.failed_validation, "elastic/failed_validation")
         self._logger.info("all files flushed")
-
-    def flush(self, files, directory):
-        destination = self.get_destination(directory)
-        for file in files:
-            source = self.get_source(file)
-            shutil.move(source, destination)
-
-    def get_source(self, file_name):
-        source = ROOT_DIR + HANDLED_DIR + file_name
-        return source
-
-    def get_destination(self, directory):
-        destination = ROOT_DIR + "/products/" + directory
-        os.makedirs(destination, exist_ok=True)
-        return destination
 
     def index_with_schema(self, products):
         for product in products:
@@ -93,9 +100,6 @@ class Elastic_7_10_2:
             except:
                 self._logger.info("error while trying to load file")
                 return None, None
-
-    def get_all_files(self, folder_name):
-        return [f for f in glob.glob(folder_name + "/*.json")]
 
     def upload(self, id, data):
         self._logger.info("trying to upload file to elasticsearch")
