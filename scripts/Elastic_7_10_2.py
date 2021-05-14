@@ -1,4 +1,6 @@
 import glob
+import shutil
+
 from time import sleep
 from scripts.builder import *
 from scripts.Moving import Moving
@@ -13,7 +15,6 @@ sys.path.insert(1, './..')
 
 HEADERS = {"Content-Type": "application/json"}
 RULING_INDEX = 'supreme_court_verdicts'
-TEST_INDEX = 'test_index_1'
 HANDLED_JSON_PRODUCTS_PATH = "products/handled_json_products"
 INDEXES_FILE_LOCATION = "products/indexes_7_10_2.txt"
 NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE = 5
@@ -22,6 +23,10 @@ DELAY_TIME_BETWEEN_ONE_REQUEST_AND_ANOTHER = 3  # In seconds
 GET_REQUEST = "GET"
 POST_REQUEST = "POST"
 PUT_REQUEST = "PUT"
+#
+TEST_INDEX = 'test_index_1'
+ROOT_DIR = os.path.abspath(os.curdir)
+HANDLED_DIR = "/products/handled_json_products/"
 
 
 class Elastic_7_10_2:
@@ -33,6 +38,8 @@ class Elastic_7_10_2:
     _elasticsearch_indexes_list = None
     elastic = None
     failed_upload = None
+    failed_validation = None
+    success_upload = None
 
     def __init__(self, logger, json_schema=True, the_amount_of_delivery=THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME):
         self.index_exists = False
@@ -43,6 +50,8 @@ class Elastic_7_10_2:
         self._elasticsearch_indexes_list = list()
         self.elastic = Elasticsearch()
         self.failed_upload = []
+        self.failed_validation = []
+        self.success_upload = []
 
     def init_index(self):
         self._logger.info("initializing elasticsearch index :: {}".format(TEST_INDEX))
@@ -59,48 +68,46 @@ class Elastic_7_10_2:
 
     def run(self):
         directory = get_path(folder=HANDLED_JSON_PRODUCTS_PATH)
-        list_of_products = self.get_files_from_folder(folder_name=directory)
-        self.index_with_schema(list_of_products)
+        products = self.get_files_from_folder(folder_name=directory)
+        self.index_with_schema(products)
 
-    def index_with_schema(self, list_of_products):
-        for (idx, product) in enumerate(list_of_products, 1):
+    def flush(self):
+        self.flush_files(self.success_upload, "elastic/success_upload")
+        self.flush_files(self.failed_upload, "elastic/failed_upload")
+        self.flush_files(self.failed_validation, "elastic/failed_validation")
+
+    def flush_files(self, files, directory):
+        destination = self.get_destination(directory)
+        for file in files:
+            source = self.get_source(file)
+            shutil.move(source, destination)
+
+    def get_source(self, file_name):
+        source = ROOT_DIR + HANDLED_DIR + file_name
+        return source
+
+    def get_destination(self, directory):
+        destination = ROOT_DIR + "/products/" + directory
+        os.makedirs(destination, exist_ok=True)
+        return destination
+
+    def index_with_schema(self, products):
+        for product in products:
             file_name = os.path.basename(product)
             self._logger.info("trying to validate {}".format(file_name))
             if validate_v1(dataFile=product):
                 self._logger.info("file is valid")
                 id, data = self.extract_data(product)
                 res = self.upload(id, data)
-
-                if not res:
-                    self._logger.info("retry file upload")
+                if res:
+                    self.success_upload.append(file_name)
+                else:
                     self._logger.info("adding file to failed list")
                     self.failed_upload.append(file_name)
-
-
-            ## retry
-                # ack = False
-                # retry = 1
-                # while ack is not True and retry <= NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE:
-                #     self._logger.info("Attempt to index Elastic # {} of file by name {}".format(retry, file_name))
-                #     # ack, self._elk_id = self.handler(file_to_read=product)
-                #     id, data = self.extract_data(product)
-                #     ack, self._elk_id = self.upload(id, data)
-                #     retry += 1
-                # if ack == 'created' | ack == 'updated':
-                #     self._elasticsearch_indexes_list.append(
-                #         "{id}::{file_name}".format(id=self._elk_id, file_name=file_name))
-                # self._logger.info(
-                #     "The file named {} finished the process and moved to its new location".format(file_name))
-                # self._moving.move_to_a_new_location(product, ack)
+                    # TODO add retry
             else:
                 self._logger.info("file is not valid")
-                # self._logger.info("UnHandles file # {} by name {}".format(idx, file_name))
-                # self._logger.info("The file is moved to an unsuccessful file folder")
-                # self._moving.move_to_a_new_location(product, False)
-
-        # if self._elasticsearch_indexes_list:
-        #     self._logger.info("Writing the results of Elastic posting in the index file")
-        #     self.write_indexes_to_file()
+                self.failed_validation.append(file_name)
 
     def extract_data(self, product):
         self._logger.info("extracting data from file")
@@ -264,6 +271,7 @@ def main():
         print("{} index created successfully".format(TEST_INDEX))
         while True:
             elastic.run()
+            elastic.flush()
             callSleep(logger=logger, minutes=10) # after finished with all the files, wait - hours * minutes * seconds
 
 
