@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from hcva.scraper.scrapers.Scraper import Scraper
 from hcva.utils.json import saveData
 from hcva.utils.time import callSleep, time
 from hcva.scraper.crawler.Crawler import Crawler, WebDriverException

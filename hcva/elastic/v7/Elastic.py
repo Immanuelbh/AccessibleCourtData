@@ -3,6 +3,7 @@ from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
 from hcva.utils.path import getPath, sep
 from elasticsearch import Elasticsearch
+import os
 import glob
 import shutil
 import sys

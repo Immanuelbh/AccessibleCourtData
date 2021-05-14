@@ -1,1 +1,0 @@
-This file is intended to maintain an existing folder in terms of Git
