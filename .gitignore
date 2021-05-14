@@ -8,5 +8,5 @@ venv/
 .idea/
 
 # project
-*[0-9].json
-*.log
+products/
+logs/

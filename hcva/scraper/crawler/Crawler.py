@@ -1,6 +1,6 @@
 from platform import system
-from hcva.extra.logger import Logger
-from hcva.extra.path import getPath, sep
+from hcva.utils.logger import Logger
+from hcva.utils.path import getPath, sep
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager

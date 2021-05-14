@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from hcva.extra.json import saveData
-from hcva.extra.time import callSleep, time
+from hcva.scraper.scrapers.Scraper import Scraper
+from hcva.utils.json import saveData
+from hcva.utils.time import callSleep, time
 from hcva.scraper.crawler.Crawler import Crawler, WebDriverException
 from hcva.scraper.scrapers.Linker import getLinks, updateDateInDB, dateURL_P1, dateURL_P2, dateURL_P3
 

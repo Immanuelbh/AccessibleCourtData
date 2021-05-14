@@ -1,4 +1,7 @@
 import sys
+
+from hcva.elastic.v5.relative_path import get_path
+
 sys.path.insert(1, '../..')
 
 import jsonschema

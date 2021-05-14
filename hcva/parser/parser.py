@@ -1,7 +1,7 @@
-from hcva.extra.logger import Logger
-from hcva.extra.time import callSleep
-from hcva.extra.json import readData, saveData
-from hcva.extra.path import getPath, sep, createDir, getFiles, remove
+from hcva.utils.logger import Logger
+from hcva.utils.time import callSleep
+from hcva.utils.json import readData, saveData
+from hcva.utils.path import getPath, sep, createDir, getFiles, remove
 
 readFolder = getPath(N=0) + f'products{sep}json_products{sep}'
 handledFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'

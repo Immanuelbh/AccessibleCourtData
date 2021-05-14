@@ -7,9 +7,9 @@ from time import sleep
 from hcva.elastic.v5.Moving import Moving
 from hcva.elastic.json_validator import *
 from hcva.elastic.v5.internet import *
-from hcva.extra.logger import Logger
-from hcva.extra.time import callSleep
-from hcva.extra.path import getPath, sep
+from hcva.utils.logger import Logger
+from hcva.utils.time import callSleep
+from hcva.utils.path import getPath, sep
 
 HEADERS = {"Content-Type": "application/json"}
 INDEX = 'supreme_court_hebrew'
