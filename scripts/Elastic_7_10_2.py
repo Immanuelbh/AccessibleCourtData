@@ -1,19 +1,15 @@
-import sys
-
-sys.path.insert(1, './..')
-
 import glob
-import requests
 from time import sleep
 from scripts.builder import *
 from scripts.Moving import Moving
 from scripts.json_validator import *
-from scripts.internet import *
 from ILCourtScraper.Extra.logger import Logger
 from ILCourtScraper.Extra.time import callSleep
 from ILCourtScraper.Extra.path import getPath, sep
 from elasticsearch import Elasticsearch
+import sys
 
+sys.path.insert(1, './..')
 
 HEADERS = {"Content-Type": "application/json"}
 RULING_INDEX = 'supreme_court_verdicts'
@@ -35,125 +31,89 @@ class Elastic_7_10_2:
     _counter = None
     _elk_id = None
     _elasticsearch_indexes_list = None
+    elastic = None
+    failed_upload = None
 
-    def __init__(self, logger=None, json_schema=True,
-                 the_amount_of_delivery=THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME):
+    def __init__(self, logger, json_schema=True, the_amount_of_delivery=THE_AMOUNT_OF_DELIVERABLES_TO_SEND_EACH_TIME):
         self.index_exists = False
         self._logger = logger
         self._moving = Moving()
         self._schema = json_schema
         self._counter = the_amount_of_delivery
         self._elasticsearch_indexes_list = list()
+        self.elastic = Elasticsearch()
+        self.failed_upload = []
 
-    def start_index(self):
-        self._logger.info("Start posting information into Elastic")
-        directory = get_path(folder=HANDLED_JSON_PRODUCTS_PATH)
-        list_of_products = self.get_files_from_folder(folder_name=directory)
-        self._logger.info("Get all file from handled_json_products folder")
-        self.index_exists = self.index_exists if True else self.create_index()
-        if self.index_exists:
-            if self._schema:
-                self.index_with_schema(list_of_products)
-            else:
-                self.index_without_schema(list_of_products)  # why index without schema?
-        else:
-            self._logger.info("Error creating index")
-
-        self._logger.info("The elastic posting process is over at this point")
-
-    def create_index(self):
-        elastic = Elasticsearch()
-        if elastic.indices.exists(index=TEST_INDEX):
+    def init_index(self):
+        self._logger.info("initializing elasticsearch index :: {}".format(TEST_INDEX))
+        if self.elastic.indices.exists(index=TEST_INDEX):
+            self._logger.info("{} index exists".format(TEST_INDEX))
             return True
         else:
-            response = elastic.indices.create(index=TEST_INDEX)
+            self._logger.info("creating index :: {} ".format(TEST_INDEX))
+            response = self.elastic.indices.create(index=TEST_INDEX)
             if response:
-                return response.acknowledged
+                return response['acknowledged']
+            else:
+                self._logger.error("Error creating index")
+
+    def run(self):
+        directory = get_path(folder=HANDLED_JSON_PRODUCTS_PATH)
+        list_of_products = self.get_files_from_folder(folder_name=directory)
+        self.index_with_schema(list_of_products)
 
     def index_with_schema(self, list_of_products):
         for (idx, product) in enumerate(list_of_products, 1):
-            if idx == 1:
-                self._logger.info("Testing in front of Elastic server")
-                if not is_connected():  # check if elastic is up
-                    self._logger.info("Elastic server is not available, please try later")
-                    return
-                else:
-                    self._logger.info("Elastic server is available")
-
-            if idx % self._counter == 0:
-                self._logger.info("Writing the results of Elastic posting in the index file")
-                self.write_indexes_to_file()
-                self._logger.info("Testing in front of Elastic server")
-                if not is_connected():  # check if elastic is up
-                    self._logger.info("Elastic server is not available, please try later")
-                    return
-                else:
-                    self._logger.info("Elastic server is available")
-
             file_name = os.path.basename(product)
-            self._logger.info("Begins file verification")
+            self._logger.info("trying to validate {}".format(file_name))
             if validate_v1(dataFile=product):
-                self._logger.info("File approved")
-                self._logger.info("Handles file # {} by name {}".format(idx, file_name))
-                ack = False
-                retry = 1
-                while ack is not True and retry <= NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE:
-                    self._logger.info("Attempt to index Elastic # {} of file by name {}".format(retry, file_name))
-                    ack, self._elk_id = self.handler(file_to_read=product)
-                    retry += 1
-                if ack is True:
-                    self._elasticsearch_indexes_list.append(
-                        "{id}::{file_name}".format(id=self._elk_id, file_name=file_name))
-                self._logger.info(
-                    "The file named {} finished the process and moved to its new location".format(file_name))
-                self._moving.move_to_a_new_location(product, ack)
+                self._logger.info("file is valid")
+                id, data = self.extract_data(product)
+                res = self.upload(id, data)
+
+                if not res:
+                    self._logger.info("retry file upload")
+                    self._logger.info("adding file to failed list")
+                    self.failed_upload.append(file_name)
+
+
+            ## retry
+                # ack = False
+                # retry = 1
+                # while ack is not True and retry <= NUMBER_OF_REPETITIONS_IN_CASE_OF_FAILURE:
+                #     self._logger.info("Attempt to index Elastic # {} of file by name {}".format(retry, file_name))
+                #     # ack, self._elk_id = self.handler(file_to_read=product)
+                #     id, data = self.extract_data(product)
+                #     ack, self._elk_id = self.upload(id, data)
+                #     retry += 1
+                # if ack == 'created' | ack == 'updated':
+                #     self._elasticsearch_indexes_list.append(
+                #         "{id}::{file_name}".format(id=self._elk_id, file_name=file_name))
+                # self._logger.info(
+                #     "The file named {} finished the process and moved to its new location".format(file_name))
+                # self._moving.move_to_a_new_location(product, ack)
             else:
-                self._logger.info("File is not approved")
-                self._logger.info("UnHandles file # {} by name {}".format(idx, file_name))
-                self._logger.info("The file is moved to an unsuccessful file folder")
-                self._moving.move_to_a_new_location(product, False)
+                self._logger.info("file is not valid")
+                # self._logger.info("UnHandles file # {} by name {}".format(idx, file_name))
+                # self._logger.info("The file is moved to an unsuccessful file folder")
+                # self._moving.move_to_a_new_location(product, False)
 
-        if self._elasticsearch_indexes_list:
-            self._logger.info("Writing the results of Elastic posting in the index file")
-            self.write_indexes_to_file()
+        # if self._elasticsearch_indexes_list:
+        #     self._logger.info("Writing the results of Elastic posting in the index file")
+        #     self.write_indexes_to_file()
 
-    def index_without_schema(self, list_of_products):
-        for (idx, product) in enumerate(list_of_products, 1):
-            if idx == 1:
-                self._logger.info("Testing in front of Elastic server")
-                if not is_connected():  # check if elastic is up
-                    self._logger.info("Elastic server is not available, please try later")
-                    return
-                else:
-                    self._logger.info("Elastic server is available")
-
-            if idx % self._counter == 0:
-                self._logger.info("Writing the results of Elastic posting in the index file")
-                self.write_indexes_to_file()
-                self._logger.info("Testing in front of Elastic server")
-                if not is_connected():  # check if elastic is up
-                    self._logger.info("Elastic server is not available, please try later")
-                    return
-                else:
-                    self._logger.info("Elastic server is available")
-
-            file_name = os.path.basename(product)
-            self._logger.info("Handles file # {} by name {}".format(idx, file_name))
-            ack = False
-            retry = 1
-            while ack is not True and retry <= 3:
-                self._logger.info("Attempt to index Elastic # {} of file by name {}".format(retry, file_name))
-                ack, self._elk_id = self.handler(file_to_read=product)
-                retry += 1
-            if ack is True:
-                self._elasticsearch_indexes_list.append(
-                    "{id}::{file_name}".format(id=self._elk_id, file_name=file_name))
-            self._logger.info("The file named {} finished the process and moved to its new location".format(file_name))
-            self._moving.move_to_a_new_location(product, ack)
-
-        if self._elasticsearch_indexes_list:
-            self._logger.info("Writing the results of Elastic posting in the index file")
-            self.write_indexes_to_file()
+    def extract_data(self, product):
+        self._logger.info("extracting data from file")
+        with open(product, encoding='utf-8') as json_file:
+            try:
+                json_data = json.load(json_file)
+                self._logger.info("file loaded successfully")
+                json_id = json_data['Doc Details']['מספר הליך']  # Take procedure number from json file
+                elasticsearch_id = build_elasticsearch_id(json_id=json_id)
+                return elasticsearch_id, json_data
+            except:
+                self._logger.info("error while trying to load file")
+                return None, None
 
     def write_indexes_to_file(self):
         path = get_path(folder=INDEXES_FILE_LOCATION)
@@ -180,12 +140,6 @@ class Elastic_7_10_2:
             file.close()
         self._elasticsearch_indexes_list = list()
 
-    def send_request(self,  method, url, data):
-        return requests.request(method, url, data=json.dumps(data), auth=('elastic', 'changeme'), headers=HEADERS)
-
-    def sent_post_request(self, url, datafile):
-        return requests.post(url, data=json.dumps(datafile), auth=('elastic', 'changeme'), headers=HEADERS)
-
     def check_status_code(self, status, type_of_request):
         self._logger.info("{type_of_request}: The Elastic file revenue status code is {status} ".format(
             type_of_request=type_of_request, status=status.status_code))
@@ -195,9 +149,6 @@ class Elastic_7_10_2:
 
     def get_files_from_folder(self, folder_name, file_type='json'):
         return [f for f in glob.glob(folder_name + os.sep + "*." + file_type)]
-
-    def send_get_request(self, url):
-        return requests.get(url, auth=('elastic', 'changeme'))
 
     def comparison_data(self, data_to_post, data_from_elastic):
         self._logger.info("Starting to compare")
@@ -227,6 +178,12 @@ class Elastic_7_10_2:
         if data_to_post == data_from_elastic or data_from_elastic == "null":
             return True
         return False
+
+    def upload(self, id, data):
+        self._logger.info("trying to upload file to elasticsearch")
+        res = self.elastic.index(index=TEST_INDEX, id=id, body=data)
+        self._logger.info("file {}".format(res['result']))
+        return res
 
     def handler(self, file_to_read):
         with open(file_to_read, encoding='utf-8') as json_file:
@@ -263,7 +220,7 @@ class Elastic_7_10_2:
                         "The result of comparison is: {result} ".format(result=the_result_of_the_comparison))
                     if the_result_of_the_comparison:
                         post_url, post_data = build_post_request_7_10_2(json_file=json_data, index=RULING_INDEX,
-                                                                     id=elasticsearch_id)
+                                                                        id=elasticsearch_id)
                         self.sleep_now()
                         post_status = self.sent_post_request(post_url, post_data)  # Do post request and get post status
                         self._logger.info("POST request sent")
@@ -300,11 +257,14 @@ class Elastic_7_10_2:
 
 
 def main():
-    _logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
-    while True:
-        Elastic_7_10_2(_logger).start_index()  # start index product to elastic DB
-        callSleep(logger=_logger,
-                  minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
+    logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
+    elastic = Elastic_7_10_2(logger)
+    index_created = elastic.init_index()
+    if index_created:
+        print("{} index created successfully".format(TEST_INDEX))
+        while True:
+            elastic.run()
+            callSleep(logger=logger, minutes=10) # after finished with all the files, wait - hours * minutes * seconds
 
 
 if __name__ == '__main__':
