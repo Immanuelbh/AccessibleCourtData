@@ -2,4 +2,4 @@
 # -*- coding: UTF-8 -*-
 
 
-from . import relative_path
+from .v5 import relative_path

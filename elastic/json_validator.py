@@ -3,7 +3,7 @@ sys.path.insert(1, './..')
 
 import jsonschema
 import json
-from elastic.relative_path import *
+from elastic.v5.relative_path import *
 
 DEFAULT_SCHEMA = get_path('json_schema/json_schema.json')
 

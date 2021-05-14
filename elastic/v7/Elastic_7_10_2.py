@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 import glob
 import shutil
 import sys
-sys.path.insert(1, './..')
+sys.path.insert(1, '../..')
 
 ELASTIC_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)
