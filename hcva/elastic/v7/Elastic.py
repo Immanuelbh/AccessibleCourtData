@@ -1,5 +1,4 @@
-from elastic.builder import *
-from elastic.json_validator import *
+from hcva.elastic.json_validator import *
 from hcva.extra.logger import Logger
 from hcva.extra.time import callSleep
 from hcva.extra.path import getPath, sep
@@ -7,7 +6,7 @@ from elasticsearch import Elasticsearch
 import glob
 import shutil
 import sys
-sys.path.insert(1, '../..')
+sys.path.insert(1, '../../..')
 
 ELASTIC_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)

@@ -1,9 +1,8 @@
 import sys
-sys.path.insert(1, '../..')
+sys.path.insert(1, '../../..')
 
 import shutil
 import ntpath
-from elastic.v5.relative_path import *
 
 FAILURE_FOLDER = "products/unhandled_json_products"
 SUCCESS_FOLDER = "products/upload_json_to_elastic"
