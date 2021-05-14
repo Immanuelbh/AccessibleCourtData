@@ -1,7 +1,7 @@
 import sys
 from hcva.elastic import main as elastic_main
 from hcva.parser.parser import main as parser_main
-from hcva.extra.sync import uploadSync, downloadSync
+from hcva.utils.sync import uploadSync, downloadSync
 from hcva.scraper.scrapers.SupremeCourt_Scraper import main as scraper_main
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 import logging
 import logging.handlers
-from hcva.extra.path import createDir
+from hcva.utils.path import createDir
 
 class Logger:
 

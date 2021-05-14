@@ -1,5 +1,5 @@
-from hcva.extra.json import readData, saveData
-from hcva.extra.path import getPath, sep, getFiles, remove
+from hcva.utils.json import readData, saveData
+from hcva.utils.path import getPath, sep, getFiles, remove
 
 readFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'
 writeFolder = getPath(N=0) + f'products{sep}unhandled_json_products{sep}'

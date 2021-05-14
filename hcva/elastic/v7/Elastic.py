@@ -1,7 +1,7 @@
 from hcva.elastic.json_validator import *
-from hcva.extra.logger import Logger
-from hcva.extra.time import callSleep
-from hcva.extra.path import getPath, sep
+from hcva.utils.logger import Logger
+from hcva.utils.time import callSleep
+from hcva.utils.path import getPath, sep
 from elasticsearch import Elasticsearch
 import glob
 import shutil
