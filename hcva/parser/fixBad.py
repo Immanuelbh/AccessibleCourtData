@@ -1,8 +1,8 @@
 from hcva.utils.json import readData, saveData
-from hcva.utils.path import getPath, sep, getFiles, remove
+from hcva.utils.path import get_path, sep, getFiles, remove
 
-readFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'
-writeFolder = getPath(N=0) + f'products{sep}unhandled_json_products{sep}'
+readFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
+writeFolder = get_path(N=0) + f'products{sep}unhandled_json_products{sep}'
 
 
 def fixSchema(doc):

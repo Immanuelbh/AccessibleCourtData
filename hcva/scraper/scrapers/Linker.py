@@ -83,6 +83,6 @@ def countStatus(db):
 
 # For manual reset or count
 # from ILCourtScraper.Extra.db import DB
-# db = DB().getDB('SupremeCourt')
+# db = DB().get_db('SupremeCourt')
 # resetDatesInDB(db)
 # countStatus(db)

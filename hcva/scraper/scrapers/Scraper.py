@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
+import os
+
 from psutil import cpu_count
 from concurrent.futures import ThreadPoolExecutor
 from hcva.utils.db import DB
 from hcva.utils.time import currTime
 from hcva.utils.logger import Logger
-from hcva.utils.path import getPath, sep, createDir
+from hcva.utils.path import get_path, sep, create_dir
+ROOT_DIR = os.path.abspath(os.curdir)
 
 
 class Scraper:
     num_of_crawlers = None  # number of threads as well
-    productsFolder = None  # product path as string
-    logger = None
+    scraped_path = None  # product path as string
     db_exists = False
 
-    def __init__(self, num_of_crawlers=0, site=None):
-        log_path = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
-        self.logger = Logger(f'{site}_Scraper.log', log_path).getLogger()
+    def __init__(self, crawler, threads=1):
+        self.crawler = crawler
+        log_path = ROOT_DIR + 'logs/hcva/'
+        self.logger = Logger('scraper.log', log_path).getLogger()
         self.db = DB(logger=self.logger)
         if self.db.client is not None:
-            self.db = self.db.getDB(site)
-            self.num_of_crawlers = min(cpu_count(), 4) if num_of_crawlers == 0 else num_of_crawlers
-            self.productsFolder = getPath(N=0) + f'products{sep}json_products{sep}'  # product path
-            self.backupFolder = getPath(N=0) + f'products{sep}backup_json_products{sep}'
-            createDir(self.productsFolder)
+            self.db = self.db.get_db()
+            self.num_of_crawlers = min(cpu_count(), 4) if threads == 0 else threads
+            self.scraped_path = ROOT_DIR + 'cases/scraped/'
+            self.backup_path = ROOT_DIR + 'cases/scraped_backup/'
+            create_dir(self.scraped_path)
         else:
-            print('err no db connection')
+            self.logger.error('err no db connection')
 
     # Functions
     def getNumOfCrawlers(self):
@@ -59,12 +62,12 @@ class Scraper:
     def get_link(self):
         return NotImplementedError
 
-    def start_crawler(self, index):
+    def start_crawlers(self, index):
         return NotImplementedError
 
     def start(self):
         with ThreadPoolExecutor() as executor:
             indexes = [index for index in range(1, self.getNumOfCrawlers() + 1)]
-            results = executor.map(self.start_crawler, indexes)
+            results = executor.map(self.start_crawlers, indexes)
         for result in results:
             print(result)

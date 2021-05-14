@@ -9,7 +9,7 @@ from hcva.elastic.json_validator import *
 from hcva.elastic.v5.internet import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
-from hcva.utils.path import getPath, sep
+from hcva.utils.path import get_path, sep
 
 HEADERS = {"Content-Type": "application/json"}
 INDEX = 'supreme_court_hebrew'
@@ -265,7 +265,7 @@ class Elastic_5_5_3:
 
 
 def main():
-    _logger = Logger('elasticsearch.log', getPath(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('elasticsearch.log', get_path(N=0) + f'logs{sep}').getLogger()
     while True:
         Elastic_5_5_3(_logger).start_index()  # start index product to elastic DB
         callSleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds

@@ -9,8 +9,8 @@ from hcva.scraper.scrapers.Linker import getLinks, updateDateInDB, dateURL_P1, d
 class SupremeCourtScraper(Scraper):
     site = 'SupremeCourt'
 
-    def __init__(self, numOfCrawlers=0):
-        super().__init__(numOfCrawlers, self.site)
+    def __init__(self, crawler, threads=1):
+        super().__init__(crawler, threads)
 
     # Functions
     def get_link(self):
@@ -330,8 +330,8 @@ class SupremeCourtScraper(Scraper):
                     case_details_dict = self.getCaseDetails(crawler, index)
                     if case_details_dict['Doc Details'] is not None:
                         name = self.randomName(index)
-                        saveData(case_details_dict, name, self.productsFolder)  # save copy for parser
-                        saveData(case_details_dict, name, self.backupFolder)  # save copy for backup
+                        saveData(case_details_dict, name, self.scraped_path)  # save copy for parser
+                        saveData(case_details_dict, name, self.backup_path)  # save copy for backup
                     tempCaseList.remove(index)
                     updateDateInDB(self.db, date, index, N, True, tempCaseList)
                     message = f'Case: {index} took in seconds: {time() - t1}'
@@ -343,7 +343,7 @@ class SupremeCourtScraper(Scraper):
                     self.logger.exception(message)
 
     # input - index as int
-    def start_crawler(self, index):
+    def start_crawlers(self, index):
         # callSleep(seconds=index * 5)  # crawlers start in different times to ensure they don't take the same page
         self.logger.info('crawler attempting to start #' + str(index))
         crawler = None
@@ -351,7 +351,7 @@ class SupremeCourtScraper(Scraper):
         self.logger.info('crawler canIGO:' + str(canIGO))
 
         while canIGO:
-            crawler = Crawler(index=index, delay=2, site=self.site) if crawler is None else crawler
+            crawler = Crawler(id_=index, delay=2, site=self.site) if crawler is None else crawler
             try:
                 date, link, first, last, caseList = self.get_link()
                 if first <= last or last == -1:
@@ -377,16 +377,18 @@ class SupremeCourtScraper(Scraper):
             crawler.close()
         return "done" + index
         # callSleep(minutes=10)
-        # self.start_crawler(index=index)
+        # self.start_crawlers(index=index)
 
 
 def main():
-    # crawler = Crawler(index=index, delay=2, site=self.site) if crawler is None else crawler
-    # scraper = SupremeCourtScraper(crawler)
-    # scraper.start_crawler(1)
+    crawler = Crawler()
+    if crawler:
+        scraper = SupremeCourtScraper(crawler, threads=1)
+        if scraper:
+            scraper.start_crawlers()
     ##
     scraper = SupremeCourtScraper()
-    scraper.start_crawler(1)  # run 1 crawler
+    scraper.start_crawlers(1)  # run 1 crawler
     # scraper.start()  # run N crawlers
 
 

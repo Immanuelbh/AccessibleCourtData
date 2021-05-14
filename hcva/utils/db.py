@@ -17,7 +17,6 @@ class DB:
             self.log('db trying to connect...')
             connection = self.client
             self.log('db connected')
-            print('db ', self.client.list_database_names())
         except ServerSelectionTimeoutError as err:
             message = 'db connection Timeout - check for if this machine ip is on whitelist'
             if self.logger is not None:
@@ -27,9 +26,9 @@ class DB:
             connection = None
         return connection
 
-    def getDB(self, dbName):
-        self.log(f'db trying to get db: {dbName}')
-        db = self.client[dbName]
+    def get_db(self, db_name='hcva'):
+        self.log(f'db trying to get db: {db_name}')
+        db = self.client[db_name]
         self.log(f'got db: {db.name}')
         return db
 

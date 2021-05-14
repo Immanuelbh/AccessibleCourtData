@@ -1,6 +1,6 @@
 import logging
 import logging.handlers
-from hcva.utils.path import createDir
+from hcva.utils.path import create_dir
 
 class Logger:
 
@@ -18,7 +18,7 @@ class Logger:
         path = logPath if logPath is not None else ""
         name = logName if logName is not None else "NoName.log"
         newLogger = logging.getLogger(logName) if logger is None else logger
-        createDir(path)
+        create_dir(path)
 
         newLogger.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d-%m-%Y %H-%M-%S')

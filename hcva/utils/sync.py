@@ -2,14 +2,14 @@ from hcva.utils.db import DB
 from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
 from hcva.utils.json import readData, saveData
-from hcva.utils.path import getPath, sep, getFiles, createDir, changeDir
+from hcva.utils.path import get_path, sep, getFiles, create_dir, changeDir
 
 
-handledFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'
-unhandledFolder = getPath(N=0) + f'products{sep}unhandled_json_products{sep}'
-backupFolder = getPath(N=0) + f'products{sep}backup_json_products{sep}'
-unBackupFolder = getPath(N=0) + f'products{sep}unBackup_json_products{sep}'
-elasticFolder = getPath(N=0) + f'products{sep}upload_json_to_elastic{sep}'
+handledFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
+unhandledFolder = get_path(N=0) + f'products{sep}unhandled_json_products{sep}'
+backupFolder = get_path(N=0) + f'products{sep}backup_json_products{sep}'
+unBackupFolder = get_path(N=0) + f'products{sep}unBackup_json_products{sep}'
+elasticFolder = get_path(N=0) + f'products{sep}upload_json_to_elastic{sep}'
 
 # key = source, value = destination
 uploadFolders = {handledFolder: handledFolder,
@@ -21,7 +21,7 @@ downloadFolders = [handledFolder, backupFolder]
 
 
 for f in [handledFolder, unhandledFolder, backupFolder, unBackupFolder, elasticFolder]:
-    createDir(f)
+    create_dir(f)
 
 
 def getFolderName(folder):
@@ -36,12 +36,12 @@ def fixData(name, data):
 
 
 def uploadSync(loop=True):
-    _logger = Logger('uploadSync.log', getPath(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('uploadSync.log', get_path(N=0) + f'logs{sep}').getLogger()
     while True:
         total = 0
         uCounter = 0
         sCounter = 0
-        db = DB().getDB('SupremeCourt')
+        db = DB().get_db('SupremeCourt')
 
         for folder in uploadFolders.keys():
             connection = db.get_collection(getFolderName(folder))
@@ -80,10 +80,10 @@ def uploadSync(loop=True):
 
 
 def downloadSync(loop=True):
-    _logger = Logger('downloadSync.log', getPath(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('downloadSync.log', get_path(N=0) + f'logs{sep}').getLogger()
     while True:
         total = 0
-        db = DB().getDB('SupremeCourt')
+        db = DB().get_db('SupremeCourt')
         for folder in downloadFolders:
             counter = 0
             connection = db.get_collection(getFolderName(folder))

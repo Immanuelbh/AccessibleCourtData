@@ -1,6 +1,7 @@
+import os
 from platform import system
 from hcva.utils.logger import Logger
-from hcva.utils.path import getPath, sep
+from hcva.utils.path import get_path, sep
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -11,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+ROOT_DIR = os.path.abspath(os.curdir)
 
 
 class Crawler:
@@ -20,18 +22,18 @@ class Crawler:
     _text_query = None  # latest text scrape as string
     _logger = None  # logging log class
 
-    def __init__(self, index=1, browser='chrome', delay=1, url=None, site=None):
-        logPath = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
-        self._logger = Logger(f'crawler_{index}.log', logPath).getLogger()
-        self._driver = self.getBrowser(browser)
+    def __init__(self, id_=1, delay=2):
+        log_path = ROOT_DIR + 'logs/hcva/'
+        self._logger = Logger(f'crawler_{id_}.log', log_path).getLogger()
+        self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
         self.update_delay(delay)  # update delay
-        self.update_page(url)  # open url
-        self._logger.info('Finished crawler Initialize')
+        # self.update_page(url)  # open url
+        self._logger.info('crawler created')
 
     # Functions
     @staticmethod
-    def getBrowser(browser='chrome'):
+    def get_browser(browser='chrome'):
         path = f'ILCourtScraper{sep}WebDrivers{sep}'
         if browser == 'chrome':
             return webdriver.Chrome(ChromeDriverManager().install())
@@ -39,7 +41,7 @@ class Crawler:
             return webdriver.Firefox(GeckoDriverManager().install())
         elif browser == 'edge':
             if system() == 'Windows':
-                return webdriver.Edge(executable_path=getPath(N=0) + path + 'msedgedriver.exe')
+                return webdriver.Edge(executable_path=get_path(N=0) + path + 'msedgedriver.exe')
 
     # input - update as boolean
     # output - return string if true, else None

@@ -1,14 +1,14 @@
 from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
 from hcva.utils.json import readData, saveData
-from hcva.utils.path import getPath, sep, createDir, getFiles, remove
+from hcva.utils.path import get_path, sep, create_dir, getFiles, remove
 
-readFolder = getPath(N=0) + f'products{sep}json_products{sep}'
-handledFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'
-unhandledFolder = getPath(N=0) + f'products{sep}unhandled_json_products{sep}'
+readFolder = get_path(N=0) + f'products{sep}json_products{sep}'
+handledFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
+unhandledFolder = get_path(N=0) + f'products{sep}unhandled_json_products{sep}'
 
 for f in [readFolder, handledFolder, unhandledFolder]:
-    createDir(f)
+    create_dir(f)
 
 
 def clean_spaces(text):
@@ -288,7 +288,7 @@ def run(folder, logger=None, minDelay=10):
 
 
 def main():
-    _logger = Logger('parser.log', getPath(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('parser.log', get_path(N=0) + f'logs{sep}').getLogger()
     _logger.info("Parser is Starting")
     run(unhandledFolder, _logger, minDelay=0)
     while True:

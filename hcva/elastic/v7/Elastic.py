@@ -1,7 +1,8 @@
+from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import callSleep
-from hcva.utils.path import getPath, sep
+from hcva.utils.path import get_path, sep
 from elasticsearch import Elasticsearch
 import os
 import glob
@@ -109,7 +110,7 @@ class Elastic:
 
 
 def main():
-    logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
+    logger = Logger('elasticsearch.log', get_path(N=2) + f'logs{sep}').getLogger()
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:

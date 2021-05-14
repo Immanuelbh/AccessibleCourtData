@@ -6,7 +6,7 @@ from os import sep, path, mkdir, remove
 
 
 # do - return current path if didn't got oldPath and remove N folders from the end
-def getPath(oldPath=None, N=0, endSep=True):
+def get_path(oldPath=None, N=0, endSep=True):
     currPath = Path().parent.absolute() if oldPath is None else oldPath  # get curr path in not provided
     splitPath = str(currPath).split(sep)  # split path to folders
     N = -N if N > 0 else len(splitPath)  # fix N for proper slice
@@ -20,7 +20,7 @@ def getFiles(folderPath, fileType='json'):
 
 
 # input - if dirName is string create folder at current path else create all the path
-def createDir(dirName, logger=None):
+def create_dir(dirName, logger=None):
     try:
         if not path.exists(dirName):  # Create target Directory if don't exist
             mkdir(dirName)
@@ -28,8 +28,8 @@ def createDir(dirName, logger=None):
             logger.info(message) if logger is not None else print(message)
     except FileNotFoundError as _:
         n = 1 if system() == 'Windows' else 2  # in case system is not windows - splitPath will have sep at the end
-        createDir(getPath(dirName, N=n))  # create parent target folder
-        createDir(dirName)  # create target folder
+        create_dir(get_path(dirName, N=n))  # create parent target folder
+        create_dir(dirName)  # create target folder
 
 
 # move file\folder from oldPath to newPath, fileName can be inside oldPath
