@@ -1,6 +1,6 @@
 import sys
 from elastic.v7.Elastic import main as elastic_main
-from hcva.Parser.parser import main as parser_main
+from hcva.parser.parser import main as parser_main
 from hcva.extra.sync import uploadSync, downloadSync
 from hcva.Scrapers.SupremeCourt_Scraper import main as scraper_main
 
