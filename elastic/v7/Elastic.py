@@ -1,5 +1,5 @@
-from scripts.builder import *
-from scripts.json_validator import *
+from elastic.builder import *
+from elastic.json_validator import *
 from ILCourtScraper.Extra.logger import Logger
 from ILCourtScraper.Extra.time import callSleep
 from ILCourtScraper.Extra.path import getPath, sep
@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 import glob
 import shutil
 import sys
-sys.path.insert(1, './..')
+sys.path.insert(1, '../..')
 
 ELASTIC_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)
@@ -36,7 +36,7 @@ def get_all_files(folder_name):
     return [f for f in glob.glob(folder_name + "/*.json")]
 
 
-class Elastic_7_10_2:
+class Elastic:
     failed_upload = []
     failed_validation = []
     success_upload = []
@@ -110,7 +110,7 @@ class Elastic_7_10_2:
 
 def main():
     logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
-    elastic = Elastic_7_10_2(logger)
+    elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
         print("{} index created successfully".format(ELASTIC_INDEX))
