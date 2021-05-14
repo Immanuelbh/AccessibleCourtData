@@ -1,5 +1,5 @@
-from scripts.builder import *
-from scripts.json_validator import *
+from elastic.builder import *
+from elastic.json_validator import *
 from ILCourtScraper.Extra.logger import Logger
 from ILCourtScraper.Extra.time import callSleep
 from ILCourtScraper.Extra.path import getPath, sep

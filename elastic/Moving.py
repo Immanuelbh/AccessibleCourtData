@@ -4,7 +4,7 @@ sys.path.insert(1, './..')
 import os
 import shutil
 import ntpath
-from scripts.relative_path import *
+from elastic.relative_path import *
 
 FAILURE_FOLDER = "products/unhandled_json_products"
 SUCCESS_FOLDER = "products/upload_json_to_elastic"
