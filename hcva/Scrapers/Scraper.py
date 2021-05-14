@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from psutil import cpu_count
 from concurrent.futures import ThreadPoolExecutor
-from hcva.Extra.db import DB
-from hcva.Extra.time import currTime
-from hcva.Extra.logger import Logger
-from hcva.Extra.path import getPath, sep, createDir
+from hcva.extra.db import DB
+from hcva.extra.time import currTime
+from hcva.extra.logger import Logger
+from hcva.extra.path import getPath, sep, createDir
 
 
 class Scraper:

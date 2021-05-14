@@ -1,4 +1,4 @@
-from hcva.Extra.time import *
+from hcva.extra.time import *
 
 dateURL_P1 = 'https://supreme.court.gov.il/Pages/SearchJudgments.aspx?&OpenYearDate=null&CaseNumber=null&DateType=2&SearchPeriod=null&COpenDate='
 dateURL_P2 = '&CEndDate='

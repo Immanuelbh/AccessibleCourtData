@@ -1,8 +1,8 @@
-from hcva.Extra.db import DB
-from hcva.Extra.logger import Logger
-from hcva.Extra.time import callSleep
-from hcva.Extra.json import readData, saveData
-from hcva.Extra.path import getPath, sep, getFiles, createDir, changeDir
+from hcva.extra.db import DB
+from hcva.extra.logger import Logger
+from hcva.extra.time import callSleep
+from hcva.extra.json import readData, saveData
+from hcva.extra.path import getPath, sep, getFiles, createDir, changeDir
 
 
 handledFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'

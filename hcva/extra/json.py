@@ -1,7 +1,7 @@
 import json
 from json.decoder import JSONDecodeError
-from hcva.Extra.path import getPath
-from hcva.Extra.time import currTime
+from hcva.extra.path import getPath
+from hcva.extra.time import currTime
 
 
 def saveData(data, fileName=None, filePath=None):

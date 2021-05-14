@@ -8,9 +8,9 @@ from elastic.builder import *
 from elastic.v5.Moving import Moving
 from elastic.json_validator import *
 from elastic.v5.internet import *
-from hcva.Extra.logger import Logger
-from hcva.Extra.time import callSleep
-from hcva.Extra.path import getPath, sep
+from hcva.extra.logger import Logger
+from hcva.extra.time import callSleep
+from hcva.extra.path import getPath, sep
 
 HEADERS = {"Content-Type": "application/json"}
 INDEX = 'supreme_court_hebrew'
