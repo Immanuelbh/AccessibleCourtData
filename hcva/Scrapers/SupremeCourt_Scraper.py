@@ -2,7 +2,7 @@
 from hcva.Scrapers.Scraper import *
 from hcva.Extra.json import saveData
 from hcva.Extra.time import callSleep, time
-from hcva.Crawler.Crawler import Crawler, WebDriverException
+from hcva.crawler.Crawler import Crawler, WebDriverException
 from hcva.Scrapers.Linker import getLinks, updateDateInDB, dateURL_P1, dateURL_P2, dateURL_P3
 
 
