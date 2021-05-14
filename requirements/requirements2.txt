@@ -2,9 +2,13 @@ attrs==19.3.0
 certifi==2020.4.5.2
 cffi==1.14.3
 chardet==3.0.4
+colorama==0.4.4
+configparser==5.0.1
 contextlib2==0.6.0.post1
+crayons==0.4.0
 cryptography==2.9.2
 dnspython==1.16.0
+elasticsearch==7.12.1
 entrypoints==0.3
 future==0.17.1
 hypothesis==5.5.5
@@ -36,4 +40,3 @@ wcwidth==0.2.5
 webdriver-manager==3.2.2
 wincertstore==0.2
 zipp==2.2.1
-
