@@ -1,6 +1,0 @@
-- improve scroll to 90+ case
-
-- bug fix:
-	cheak for bugs
-
-
