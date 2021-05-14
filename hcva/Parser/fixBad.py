@@ -1,5 +1,5 @@
-from ILCourtScraper.Extra.json import readData, saveData
-from ILCourtScraper.Extra.path import getPath, sep, getFiles, remove
+from hcva.Extra.json import readData, saveData
+from hcva.Extra.path import getPath, sep, getFiles, remove
 
 readFolder = getPath(N=0) + f'products{sep}handled_json_products{sep}'
 writeFolder = getPath(N=0) + f'products{sep}unhandled_json_products{sep}'

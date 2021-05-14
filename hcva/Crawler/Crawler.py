@@ -1,6 +1,6 @@
 from platform import system
-from ILCourtScraper.Extra.logger import Logger
-from ILCourtScraper.Extra.path import getPath, sep
+from hcva.Extra.logger import Logger
+from hcva.Extra.path import getPath, sep
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
