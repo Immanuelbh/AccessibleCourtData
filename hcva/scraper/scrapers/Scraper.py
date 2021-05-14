@@ -14,8 +14,8 @@ class Scraper:
     db_exists = False
 
     def __init__(self, num_of_crawlers=0, site=None):
-        logPath = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
-        self.logger = Logger(f'{site}_Scraper.log', logPath).getLogger()
+        log_path = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
+        self.logger = Logger(f'{site}_Scraper.log', log_path).getLogger()
         self.db = DB(logger=self.logger)
         if self.db.client is not None:
             self.db = self.db.getDB(site)

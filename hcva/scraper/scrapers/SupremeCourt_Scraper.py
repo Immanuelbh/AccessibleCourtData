@@ -381,11 +381,14 @@ class SupremeCourtScraper(Scraper):
 
 
 def main():
+    # crawler = Crawler(index=index, delay=2, site=self.site) if crawler is None else crawler
+    # scraper = SupremeCourtScraper(crawler)
+    # scraper.start_crawler(1)
+    ##
     scraper = SupremeCourtScraper()
     scraper.start_crawler(1)  # run 1 crawler
     # scraper.start()  # run N crawlers
 
 
-# run scraper only if run directly from python and not from import
 if __name__ == "__main__":
     main()
