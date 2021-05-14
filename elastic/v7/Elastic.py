@@ -36,7 +36,7 @@ def get_all_files(folder_name):
     return [f for f in glob.glob(folder_name + "/*.json")]
 
 
-class Elastic_7_10_2:
+class Elastic:
     failed_upload = []
     failed_validation = []
     success_upload = []
@@ -110,7 +110,7 @@ class Elastic_7_10_2:
 
 def main():
     logger = Logger('elasticsearch.log', getPath(N=2) + f'logs{sep}').getLogger()
-    elastic = Elastic_7_10_2(logger)
+    elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
         print("{} index created successfully".format(ELASTIC_INDEX))
