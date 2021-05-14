@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from ILCourtScraper.Scrapers.Scraper import *
-from ILCourtScraper.Extra.json import saveData
-from ILCourtScraper.Extra.time import callSleep, time
-from ILCourtScraper.Crawler.Crawler import Crawler, WebDriverException
-from ILCourtScraper.Scrapers.Linker import getLinks, updateDateInDB, dateURL_P1, dateURL_P2, dateURL_P3
+from hcva.extra.json import saveData
+from hcva.extra.time import callSleep, time
+from hcva.scraper.crawler.Crawler import Crawler, WebDriverException
+from hcva.scraper.scrapers.Linker import getLinks, updateDateInDB, dateURL_P1, dateURL_P2, dateURL_P3
 
 
 class SupremeCourtScraper(Scraper):

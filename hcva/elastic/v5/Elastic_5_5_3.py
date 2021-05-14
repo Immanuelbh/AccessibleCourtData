@@ -1,16 +1,15 @@
 import sys
-sys.path.insert(1, '../..')
+sys.path.insert(1, '../../..')
 
 import glob
 import requests
 from time import sleep
-from elastic.builder import *
-from elastic.v5.Moving import Moving
-from elastic.json_validator import *
-from elastic.v5.internet import *
-from ILCourtScraper.Extra.logger import Logger
-from ILCourtScraper.Extra.time import callSleep
-from ILCourtScraper.Extra.path import getPath, sep
+from hcva.elastic.v5.Moving import Moving
+from hcva.elastic.json_validator import *
+from hcva.elastic.v5.internet import *
+from hcva.extra.logger import Logger
+from hcva.extra.time import callSleep
+from hcva.extra.path import getPath, sep
 
 HEADERS = {"Content-Type": "application/json"}
 INDEX = 'supreme_court_hebrew'
