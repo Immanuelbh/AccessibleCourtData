@@ -11,8 +11,6 @@ ROOT_DIR = os.path.abspath(os.curdir)
 
 
 class Scraper:
-    num_of_crawlers = None  # number of threads as well
-    scraped_path = None  # product path as string
     db_exists = False
 
     def __init__(self, threads=1):
@@ -22,7 +20,8 @@ class Scraper:
         self.db = Database(self.logger)
         if self.db.client is not None:
             self.db = self.db.get_db()
-            self.num_of_crawlers = min(cpu_count(), 4) if threads == 0 else threads
+            self.num_of_crawlers = threads
+            # self.num_of_crawlers = min(cpu_count(), 4) if threads == 0 else threads
             self.scraped_path = ROOT_DIR + '/cases/scraped/'
             self.backup_path = ROOT_DIR + '/cases/scraped_backup/'
             create_dir(self.scraped_path)

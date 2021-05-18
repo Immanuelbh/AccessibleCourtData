@@ -25,15 +25,15 @@ def createDates(startDate=None, fmt="%d-%m-%Y"):
     return dates
 
 
-def upToDateDB(db=None):
-    datesList = list()
+def up_to_date_db(db=None):
+    dates_list = list()
     if db is not None:
         collection = db.get_collection('dates')
         query = collection.find({})
         for item in query:
             item.pop('_id')
-            datesList.append(item)
-        new_dates = createDates(startDate=datesList[-1]['date']) if len(datesList) > 0 else createDates()
+            dates_list.append(item)
+        new_dates = createDates(startDate=dates_list[-1]['date']) if len(dates_list) > 0 else createDates()
 
         for item in new_dates:
             collection = db.get_collection('dates')
@@ -56,7 +56,7 @@ def resetDatesInDB(db):
 #                           ({'date': string, first': int, 'last': int, 'is taken': boolean, 'case List': list})
 def get_links(db):
     if db is not None:  # use db
-        upToDateDB(db)
+        up_to_date_db(db)
         collection = db.get_collection('dates')
         dateList = list(collection.find({'is taken': False}).skip(0))
         if len(dateList) > 0:

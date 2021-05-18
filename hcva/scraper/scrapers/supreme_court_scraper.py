@@ -4,14 +4,16 @@ from hcva.utils.json import save_data
 from hcva.utils.time import callSleep, time
 from hcva.scraper.crawler.crawler import Crawler, WebDriverException
 from hcva.scraper.scrapers.linker import get_links, update_date_in_db, dateURL_P1, dateURL_P2, dateURL_P3
+from concurrent.futures import ThreadPoolExecutor
 
 
 class SupremeCourtScraper(Scraper):
     site = 'SupremeCourt'
 
     def __init__(self, crawler, threads=1):
-        self.crawler = crawler
         super().__init__(threads)
+        self.crawler = crawler
+        self.threads = threads
 
     def get_link(self):
         item = get_links(self.db)
@@ -331,8 +333,12 @@ class SupremeCourtScraper(Scraper):
                 except Exception as err:  # Unknown Exception appear
                     self.logger.exception(f'Case: {index} Failed :: {err}')
 
-    def run(self):
-        # self.start_crawlers()
+    def m_run(self):
+        with ThreadPoolExecutor(max_workers=self.threads) as executor:
+            executor.map(self.run, range(self.threads))
+
+    def run(self, idx):
+        self.logger.info(f'starting thread #{idx}')
         try:
             date, link, first, last, case_list = self.get_link()
             if first <= last or last == -1:
@@ -346,6 +352,8 @@ class SupremeCourtScraper(Scraper):
             self.logger.exception(f'browser closed or crashed :: {err}')
         except Exception as err:
             self.logger.exception('unknown error' + err)
+
+        self.logger.info(f'finished thread #{idx}')
 
         if self.crawler is not None:
             self.crawler.close()
@@ -390,9 +398,10 @@ class SupremeCourtScraper(Scraper):
 def main():
     crawler = Crawler()
     if crawler:
-        scraper = SupremeCourtScraper(crawler, threads=1)
+        scraper = SupremeCourtScraper(crawler, threads=2)
         if scraper:
-            scraper.run()
+            scraper.m_run()
+            # scraper.run()
     ##
     # scraper = SupremeCourtScraper()
     # scraper.start_crawlers(1)  # run 1 crawler
