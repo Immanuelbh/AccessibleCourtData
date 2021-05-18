@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 ROOT_DIR = os.path.abspath(os.curdir)
+log_path = ROOT_DIR + '/logs/hcva/'
 
 
 class Crawler:
@@ -22,12 +23,11 @@ class Crawler:
     _text_query = None  # latest text scrape as string
     _logger = None  # logging log class
 
-    def __init__(self, id_=1):
-        log_path = ROOT_DIR + '/logs/hcva/'
+    def __init__(self, id_=1, url=None):
         self._logger = Logger(f'crawler_{id_}.log', log_path).getLogger()
         self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
-        # self.update_page(url)  # open url
+        self.update_page(url)  # open url
         self._logger.info('crawler created')
 
     # Functions

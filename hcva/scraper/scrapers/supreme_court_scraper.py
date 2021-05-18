@@ -129,7 +129,7 @@ class SupremeCourtScraper(Scraper):
     # input - index as int
     # output - array of titles as strings
     @staticmethod
-    def getTitles(index):
+    def get_titles(index):
         if index == 1:
             return [['מספר הליך', 'מדור', 'תאריך הגשה', 'סטטוס תיק'], ['מערער', 'משיב', 'אירוע אחרון']]
         elif index == 2:
@@ -145,9 +145,9 @@ class SupremeCourtScraper(Scraper):
         elif index == 7:
             return ['#', 'תיאור בקשה', 'תאריך', 'מגיש', 'נדחה מהמרשם']
 
-    def getGeneralDetails(self, crawler, index):
+    def get_general_details(self, crawler, index):
         m_dict = dict()
-        title = self.getTitles(index)
+        title = self.get_titles(index)
         for col in range(len(title)):
             for row in range(len(title[col])):
                 string = '/html/body/div/div[2]/div[1]/div[' + str(col + 1) + ']/div[' + str(row + 1) + ']/span[2]'
@@ -156,9 +156,9 @@ class SupremeCourtScraper(Scraper):
                 m_dict[title[col][row]] = crawler.get_text_query(update)
         return m_dict
 
-    def getOtherCaseDetails(self, crawler, index):
+    def get_other_case_details(self, crawler, index):
         m_list = list()
-        title = self.getTitles(index)
+        title = self.get_titles(index)
         row = 0
         keepGoing = True
 
@@ -205,9 +205,9 @@ class SupremeCourtScraper(Scraper):
         callSleep(seconds=1)
 
         if index == 1:
-            func = self.getGeneralDetails
+            func = self.get_general_details
         else:
-            func = self.getOtherCaseDetails
+            func = self.get_other_case_details
 
         if elem is not None:
             return func(crawler, index)

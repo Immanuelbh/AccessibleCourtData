@@ -1,8 +1,7 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-
 from hcva.utils.logger import Logger
 
 DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
@@ -12,12 +11,13 @@ DB_NAME = 'hcva'
 ROOT_DIR = os.path.abspath(os.curdir)
 log_path = ROOT_DIR + f'/logs/{DB_NAME}/'
 
+
 class Database:
     logger = Logger('db.log', log_path).getLogger()
-    current = datetime.today()  # .strftime('%d-%m-%Y')
     collection = None
 
     def __init__(self):
+        self.current = self.day_before(datetime.today())  # yesterday
         self.client = MongoClient(DB_URI)
         self.get_connection()
 
@@ -54,11 +54,12 @@ class Database:
         self.logger.info(f'getting next available date')
         while self.date_used(self.current):
             self.logger.info(f'date is exists')
-            self.current = self.next_date(self.current)
+            self.current = self.day_before(self.current)
 
         self.logger.info(f'date is available')
-        self.update_status(self.current, 'in progress')
-        return self.current.strftime("%d-%m-%Y")  # return formatted?
+        # self.update_status(self.current, 'in progress')  # comment out for testing
+        return '16-5-2021'  # return formatted?
+        # return self.current.strftime("%d-%m-%Y")  # return formatted?
 
     def update_status(self, date, status):
         self.logger.info(f'setting {date.strftime("%d-%m-%Y")} status to: {status}')
@@ -75,18 +76,12 @@ class Database:
         })
         return res.retrieved > 0
 
-    def next_date(self, date):
-        prev = date - datetime.timedelta(1)
+    def day_before(self, date):
+        prev = date - timedelta(1)
         if prev.weekday() == SATURDAY:
-            prev = prev - datetime.timedelta(1)
+            prev = prev - timedelta(1)
 
         return prev
-
-    # def init_db(self, logger, db_name):
-    #     if self.client is None:
-    #         logger.error('err no db connection')
-    #         return None
-    #     return self.client.get_db(db_name)
 
     def init_collection(self, db_name, collection_name):
         self.collection = self.client[db_name].get_collection(collection_name)
