@@ -398,7 +398,7 @@ class SupremeCourtScraper(Scraper):
 def main():
     crawler = Crawler()
     if crawler:
-        scraper = SupremeCourtScraper(crawler, threads=2)
+        scraper = SupremeCourtScraper(crawler, threads=1)
         if scraper:
             scraper.m_run()
             # scraper.run()

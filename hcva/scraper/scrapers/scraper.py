@@ -17,9 +17,9 @@ class Scraper:
         log_path = ROOT_DIR + '/logs/hcva/'
         self.logger = Logger('scraper.log', log_path).getLogger()
         ##
-        self.db = Database(self.logger)
+        self.db = Database()
         if self.db.client is not None:
-            self.db = self.db.get_db()
+            self.db = self.db.get_db('hcva')
             self.num_of_crawlers = threads
             # self.num_of_crawlers = min(cpu_count(), 4) if threads == 0 else threads
             self.scraped_path = ROOT_DIR + '/cases/scraped/'

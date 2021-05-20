@@ -1,4 +1,6 @@
 import os
+import time
+
 from hcva.scraper.crawler.crawler import Crawler
 from hcva.utils.json import save_data
 from hcva.utils.path import create_dir
@@ -257,15 +259,15 @@ def get_case_details(crawler, index):
 def scrape(idx, date):
     url = build_url(date)
     c = Crawler(idx, url)  # TODO make sure page is fully loaded
-    # they used check num cases -> get num cases
-    # retry for slow pages?
+    time.sleep(5)
     num_cases = get_num_cases(c)
     cases = []
-    for i in range(num_cases):
+    for i in range(num_cases, 0, -1):  # scrape from last to first
         case_details = get_case_details(c, i)
-        if case_details['Doc Details'] is not None:
+        if case_details is not None:
             cases.append(case_details)
 
+    cases.reverse()
     return cases
     # name = f'{date}__{idx}.json'
     # save_data(case_details, name, SCRAPED_DIR)  # save copy for parser

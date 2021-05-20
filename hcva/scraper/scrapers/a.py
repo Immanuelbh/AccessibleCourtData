@@ -32,10 +32,10 @@ class A:
         self.logger.info(f'starting thread #{idx}')
         d = self.db_instance.get_date()  # TODO turn atomic
         cases = s.scrape(idx, d)
-        for case in cases:
-            name = f'{d}__{idx}.json'
+        for i, case in enumerate(cases, start=1):
+            name = f'{d}__{i}.json'
             save_data(case, name, SCRAPED_DIR)  # save copy for parser
-            save_data(case, name, BACKUP_DIR)  # save copy for backup
+            # save_data(case, name, BACKUP_DIR)  # save copy for backup
             print(f'saved {name}')
 
 
