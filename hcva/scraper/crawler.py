@@ -1,6 +1,7 @@
+import os
+import threading
 from platform import system
 from hcva.utils.logger import Logger
-from hcva.utils.path import getPath, sep
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -11,35 +12,34 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+ROOT_DIR = os.path.abspath(os.curdir)
+log_path = ROOT_DIR + '/logs/hcva/'
 
 
 class Crawler:
     _driver = None  # Web Driver
-    _delay = None  # Timer for finding web element as int
+    _delay = 2  # Timer for finding web element as int
     _url = None  # starting page as string
-    _text_query = None  # latest text scrape as string
+    _text_query = None  # latest text get as string
     _logger = None  # logging log class
 
-    def __init__(self, index=1, browser='chrome', delay=1, url=None, site=None):
-        logPath = getPath(N=0) + f'logs{sep}{site}{sep}' if site is not None else getPath(N=0) + f'logs{sep}'
-        self._logger = Logger(f'crawler_{index}.log', logPath).getLogger()
-        self._driver = self.getBrowser(browser)
+    def __init__(self, url):
+        self._logger = Logger(f'crawler_{threading.current_thread().name}.log', log_path).get_logger()
+        self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
-        self.update_delay(delay)  # update delay
         self.update_page(url)  # open url
-        self._logger.info('Finished crawler Initialize')
+        self._logger.info('crawler created')
 
     # Functions
     @staticmethod
-    def getBrowser(browser='chrome'):
-        path = f'ILCourtScraper{sep}WebDrivers{sep}'
+    def get_browser(browser='chrome'):
         if browser == 'chrome':
             return webdriver.Chrome(ChromeDriverManager().install())
         elif browser == 'firefox':
             return webdriver.Firefox(GeckoDriverManager().install())
         elif browser == 'edge':
             if system() == 'Windows':
-                return webdriver.Edge(executable_path=getPath(N=0) + path + 'msedgedriver.exe')
+                return webdriver.Edge(executable_path=ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
 
     # input - update as boolean
     # output - return string if true, else None
@@ -49,16 +49,6 @@ class Crawler:
             return self._text_query
         else:
             return None
-
-    # input - delay as int
-    # do - change the main delay for the crawler
-    def update_delay(self, delay=1):
-        if type(delay) is int:
-            self._delay = delay
-            message = f'Delay change to: {delay}'
-        else:
-            message = 'Delay input was not int'
-        self._logger.info(message)
 
     # input - url as string
     # output - return true if succeed else false
