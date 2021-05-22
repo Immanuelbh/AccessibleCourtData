@@ -2,7 +2,7 @@ import threading
 from os import path, curdir
 from concurrent.futures import ThreadPoolExecutor
 from hcva.utils.json import save_data
-from hcva.scraper.scrapers import scraper
+from hcva.scraper import scraper
 from hcva.utils.database import Database
 from hcva.utils.logger import Logger
 from hcva.utils.path import create_dir
@@ -12,33 +12,33 @@ COLLECTION_NAME = 'v3'
 ROOT_DIR = path.abspath(curdir)
 LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
 SCRAPED_DIR = ROOT_DIR + '/cases/scraped/'
-BACKUP_DIR = ROOT_DIR + '/cases/scraped_backup/'
+# BACKUP_DIR = ROOT_DIR + '/cases/scraped_backup/'
 
 
 class App:
-    logger = Logger('s.log', LOG_DIR).getLogger()
+    logger = Logger('app.log', LOG_DIR).get_logger()
 
     def __init__(self, threads):
         self.threads = threads
-        self.db_instance = Database()
-        self.db_instance.init_collection(DB_NAME, COLLECTION_NAME)
+        self.db = Database()
+        self.db.init_collection(DB_NAME, COLLECTION_NAME)
         create_dir(SCRAPED_DIR)
 
     def run(self):
-        dates = self.db_instance.get_dates()
+        dates = self.db.get_dates()
         with ThreadPoolExecutor(max_workers=self.threads) as executor:
             executor.map(self.scrape, dates)
 
     def scrape(self, d):
         self.logger.info(f'starting thread #{threading.current_thread().name}')
         d = d['date']
-        cases = scraper.scrape(d)
+        cases = scraper.get(d)
         for i, case in enumerate(cases, start=1):
             name = f'{d}__{i}.json'
             save_data(case, name, SCRAPED_DIR)
             self.logger.info(f'saved {name}')
 
-        self.db_instance.update_status(d, 'done')  # TODO add empty/not empty
+        self.db.update_status(d, 'done')  # TODO add empty/not empty
         self.logger.info(f'thread #{threading.current_thread().name} finished')
 
 

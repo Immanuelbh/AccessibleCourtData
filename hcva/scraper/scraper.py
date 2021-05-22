@@ -1,6 +1,6 @@
 import time
-from hcva.scraper.crawler.crawler import Crawler
-from hcva.utils.time import callSleep
+from hcva.scraper.crawler import Crawler
+from hcva.utils.time import call_sleep
 
 BASE_URL = 'https://supreme.court.gov.il/Pages/SearchJudgments.aspx?&DateType=2&freeText=null&CaseNumber=null'
 
@@ -106,7 +106,7 @@ def is_blocked_case(crawler):
         print('this case in a private !!!')
         result = False
     else:
-        print('this case in not private - we can scrape more info')
+        print('this case in not private - we can get more info')
         result = True
     return result
 
@@ -165,7 +165,7 @@ def get_other_case_details(crawler, index):
 
             if update:
                 m_dict[title[col]] = text
-            else:  # No more info to scrape here
+            else:  # No more info to get here
                 keepGoing = False
                 break
 
@@ -185,7 +185,7 @@ def get_column_text(crawler, index):
 
     string = get_string_by_index('inside column', index)
     elem = crawler.find_elem('xpath', string)
-    callSleep(seconds=1)
+    call_sleep(seconds=1)
 
     if index == 1:
         func = get_general_details
@@ -239,13 +239,13 @@ def get_case_details(crawler, index):
     return case_details_dict
 
 
-def scrape(date):
+def get(date):
     url = build_url(date)
     c = Crawler(url=url)  # TODO make sure page is fully loaded
     time.sleep(5)
     num_cases = get_num_cases(c)
     cases = []
-    for i in range(num_cases, 0, -1):  # scrape from last to first
+    for i in range(num_cases, 0, -1):  # get from last to first
         case_details = get_case_details(c, i)
         if case_details is not None:
             cases.append(case_details)

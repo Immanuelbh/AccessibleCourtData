@@ -1,11 +1,11 @@
 from hcva.utils.logger import Logger
-from hcva.utils.time import callSleep
-from hcva.utils.json import readData, save_data
-from hcva.utils.path import get_path, sep, create_dir, getFiles, remove
+from hcva.utils.time import call_sleep
+from hcva.utils.json import read_data, save_data
+from hcva.utils.path import get_path, sep, create_dir, get_files, remove
 
-readFolder = get_path(N=0) + f'products{sep}json_products{sep}'
-handledFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
-unhandledFolder = get_path(N=0) + f'products{sep}unhandled_json_products{sep}'
+readFolder = get_path(n=0) + f'products{sep}json_products{sep}'
+handledFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
+unhandledFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
 
 for f in [readFolder, handledFolder, unhandledFolder]:
     create_dir(f)
@@ -238,7 +238,7 @@ def moveFile(data, fileName, sourceFolder, destFolder):
 
 
 def run(folder, logger=None, minDelay=10):
-    listOfFiles = getFiles(folderPath=folder)
+    listOfFiles = get_files(folder_path=folder)
     message = f"Got {len(listOfFiles)} files to parse."
     logger.info(message) if logger is not None else print(message)
     if len(listOfFiles) > 0:
@@ -250,7 +250,7 @@ def run(folder, logger=None, minDelay=10):
                 index += 1
                 message = f"Starting to parse file {index} of {len(listOfFiles)}... "
                 logger.info(message) if logger is not None else print(message, end='')
-                doc = readData('', fileName)  # fileName include path and os.sep not needed
+                doc = read_data('', fileName)  # fileName include path and os.sep not needed
                 if len(doc) < 1:  # private case - we got empty file
                     message = "Skipped because len"
                     logger.info(message) if logger is not None else print(message)
@@ -284,11 +284,11 @@ def run(folder, logger=None, minDelay=10):
 
     else:
         logger.info('Parser finished his job.') if logger is not None else print('Parser finished his job.')
-        callSleep(logger=logger, minutes=minDelay)  # after finished with all the files wait a bit - hours * minutes * seconds
+        call_sleep(logger=logger, minutes=minDelay)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
 def main():
-    _logger = Logger('parser.log', get_path(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('parser.log', get_path(n=0) + f'logs{sep}').get_logger()
     _logger.info("Parser is Starting")
     run(unhandledFolder, _logger, minDelay=0)
     while True:

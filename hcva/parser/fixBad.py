@@ -1,8 +1,8 @@
-from hcva.utils.json import readData, save_data
-from hcva.utils.path import get_path, sep, getFiles, remove
+from hcva.utils.json import read_data, save_data
+from hcva.utils.path import get_path, sep, get_files, remove
 
-readFolder = get_path(N=0) + f'products{sep}handled_json_products{sep}'
-writeFolder = get_path(N=0) + f'products{sep}unhandled_json_products{sep}'
+readFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
+writeFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
 
 
 def fixSchema(doc):
@@ -20,9 +20,9 @@ def moveFile(data, fileName, sourceFolder, destFolder):
 
 
 def run():
-    listOfFiles = getFiles(folderPath=readFolder)
+    listOfFiles = get_files(folder_path=readFolder)
     for fileName in listOfFiles:
-        doc = readData('', fileName)  # fileName include path and os.sep not needed
+        doc = read_data('', fileName)  # fileName include path and os.sep not needed
         if 'לפני' in doc['Doc Details'].keys():
             doc = fixSchema(doc)
             moveFile(doc, fileName, readFolder, writeFolder)

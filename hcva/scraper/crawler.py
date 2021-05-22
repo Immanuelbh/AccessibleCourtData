@@ -1,7 +1,7 @@
 import os
+import threading
 from platform import system
 from hcva.utils.logger import Logger
-from hcva.utils.path import get_path, sep
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -20,11 +20,11 @@ class Crawler:
     _driver = None  # Web Driver
     _delay = 2  # Timer for finding web element as int
     _url = None  # starting page as string
-    _text_query = None  # latest text scrape as string
+    _text_query = None  # latest text get as string
     _logger = None  # logging log class
 
-    def __init__(self, id_=1, url=None):
-        self._logger = Logger(f'crawler_{id_}.log', log_path).getLogger()
+    def __init__(self, url):
+        self._logger = Logger(f'crawler_{threading.current_thread().name}.log', log_path).get_logger()
         self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
         self.update_page(url)  # open url

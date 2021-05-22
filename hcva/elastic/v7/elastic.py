@@ -1,7 +1,7 @@
 from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
 from hcva.utils.logger import Logger
-from hcva.utils.time import callSleep
+from hcva.utils.time import call_sleep
 from hcva.utils.path import get_path, sep
 from elasticsearch import Elasticsearch
 import os
@@ -110,7 +110,7 @@ class Elastic:
 
 
 def main():
-    logger = Logger('elasticsearch.log', get_path(N=2) + f'logs{sep}').getLogger()
+    logger = Logger('elasticsearch.log', get_path(n=2) + f'logs{sep}').get_logger()
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
@@ -118,7 +118,7 @@ def main():
         while True:
             elastic.run()
             elastic.flush_all()
-            callSleep(logger=logger, minutes=10)  # after finished with all the files, wait - hours * minutes * seconds
+            call_sleep(logger=logger, minutes=10)  # after finished with all the files, wait - hours * minutes * seconds
 
 
 if __name__ == '__main__':

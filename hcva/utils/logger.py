@@ -2,25 +2,26 @@ import logging
 import logging.handlers
 from hcva.utils.path import create_dir
 
+
 class Logger:
 
-    def __init__(self, logName, logPath, logger=None):
-        self.logger = self.startLogger(logName, logPath, logger)
+    def __init__(self, log_name, log_path, logger=None):
+        self.logger = self.start_logger(log_name, log_path, logger)
 
-    def getLogger(self):
+    def get_logger(self):
         return self.logger
 
     # input - logName as string, logPath as string, logger as logging class
     # output - logger as logging class
     # do - set logger settings
     @staticmethod
-    def startLogger(logName, logPath, logger=None):
-        path = logPath if logPath is not None else ""
-        name = logName if logName is not None else "NoName.log"
-        newLogger = logging.getLogger(logName) if logger is None else logger
+    def start_logger(log_name, log_path, logger=None):
+        path = log_path if log_path is not None else ""
+        name = log_name if log_name is not None else "NoName.log"
+        new_logger = logging.getLogger(log_name) if logger is None else logger
         create_dir(path)
 
-        newLogger.setLevel(logging.DEBUG)
+        new_logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d-%m-%Y %H-%M-%S')
 
         stream_handler = logging.StreamHandler()
@@ -29,8 +30,8 @@ class Logger:
         file_handler = logging.handlers.RotatingFileHandler(path + name, maxBytes=10485760, backupCount=10)
         file_handler.setFormatter(formatter)
 
-        newLogger.addHandler(file_handler)
-        newLogger.addHandler(stream_handler)
+        new_logger.addHandler(file_handler)
+        new_logger.addHandler(stream_handler)
 
-        newLogger.info('Initialize Log')
-        return newLogger
+        new_logger.info('Initialize Log')
+        return new_logger

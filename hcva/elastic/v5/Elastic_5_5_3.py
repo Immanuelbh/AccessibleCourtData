@@ -8,7 +8,7 @@ from hcva.elastic.v5.Moving import Moving
 from hcva.elastic.json_validator import *
 from hcva.elastic.v5.internet import *
 from hcva.utils.logger import Logger
-from hcva.utils.time import callSleep
+from hcva.utils.time import call_sleep
 from hcva.utils.path import get_path, sep
 
 HEADERS = {"Content-Type": "application/json"}
@@ -265,10 +265,10 @@ class Elastic_5_5_3:
 
 
 def main():
-    _logger = Logger('elasticsearch.log', get_path(N=0) + f'logs{sep}').getLogger()
+    _logger = Logger('elasticsearch.log', get_path(n=0) + f'logs{sep}').get_logger()
     while True:
         Elastic_5_5_3(_logger).start_index()  # start index product to elastic DB
-        callSleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
+        call_sleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
 if __name__ == '__main__':
