@@ -2,16 +2,14 @@ import sys
 from hcva.elastic.v7.elastic import main as elastic_main
 from hcva.parser.parser import main as parser_main
 from hcva.utils.sync import uploadSync, downloadSync
-from hcva.scraper.scrapers.supreme_court_scraper import main as scraper_main
-from hcva.scraper.scrapers.a import main as app
+from hcva.scraper.scrapers.app import main as app
 
 if __name__ == '__main__':
-    functions = {1: scraper_main,
+    functions = {1: app,
                  2: parser_main,
                  3: elastic_main,
                  4: uploadSync,
                  5: downloadSync,
-                 6: app
                  }
 
     if len(sys.argv) > 1:
