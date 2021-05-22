@@ -1,11 +1,15 @@
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, sep, create_dir, get_files, remove
+from hcva.utils.path import get_path, sep, create_dir, get_files, remove, get_all_files
 
 readFolder = get_path(n=0) + f'products{sep}json_products{sep}'
 handledFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
 unhandledFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
+
+SCRAPED_DIR = "/cases/scraped/"
+PARSED_DIR = "/cases/parsed/"
+
 
 for f in [readFolder, handledFolder, unhandledFolder]:
     create_dir(f)
@@ -287,13 +291,74 @@ def run(folder, logger=None, min_delay=10):
         call_sleep(logger=logger, minutes=min_delay)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
+def parse(case):
+    return 'parse'
+
+
+def run_v2(logger, cases):
+    if not cases:
+        logger.info(f'no cases to parse')
+        return
+
+    logger.info(f'parsing f{len(cases)} cases')
+    for case in cases:
+        logger.info(f'trying to parse {case}...')
+        c = read_data(case)
+        if c:
+            logger.info(f'read {case} successfully')
+            p = parse(c)
+            if p:
+                logger.info(f'parsed {case} successfully')
+                save_data(p, case, PARSED_DIR)
+                logger.info(f'saved {case} to {PARSED_DIR}')
+
+
+        # index += 1
+        # message = f"Starting to parse file {index} of {len(list_of_files)}... "
+        # logger.info(message) if logger is not None else print(message, end='')
+        # doc = read_data('', fileName)  # fileName include path and os.sep not needed
+        # if len(doc) < 1:  # private case - we got empty file
+        #     message = "Skipped because len"
+        #     logger.info(message) if logger is not None else print(message)
+        #     skip_counter += 1
+        #     move_file(doc, fileName, folder, unhandledFolder)
+        #     continue
+        # elif 'פני:' not in str(doc['Doc Details']):  # old type of case
+        #     message = "Skipped because missing key"
+        #     logger.info(message) if logger is not None else print(message)
+        #     skip_counter += 1
+        #     move_file(doc, fileName, folder, unhandledFolder)
+        #     continue
+        # doc['Doc Details'], succeed = parser(doc['Doc Details'])  # if succeed Dict, else text
+        # write_folder = handledFolder if succeed else unhandledFolder
+        #
+        # if succeed:
+        #     insert info data into doc details and remove old duplicate
+            # for key in doc['Doc Info']:
+            #     doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
+            #         else [int(s) for s in doc['Doc Info'][key].split() if s.isdigit()][0]
+            # doc.pop('Doc Info', None)
+            # counter += 1
+            # logger.info(f"File {index} succeed") if logger is not None else print('Succeed')
+        # else:
+        #     logger.info(f"File {index} failed") if logger is not None else print('Failed')
+        # move_file(doc, fileName, folder, write_folder)
+
+    logger.info(f'finished parsing {len(cases)} cases')
+
+
 def main():
-    _logger = Logger('parser.log', get_path(n=0) + f'logs{sep}').get_logger()
-    _logger.info("Parser is Starting")
-    run(unhandledFolder, _logger, min_delay=0)
+    logger = Logger('parser.log', get_path(n=0) + f'logs/').get_logger()
+    logger.info("parser is starting")
+    create_dir(PARSED_DIR)
     while True:
-        _logger.info("Parser is Starting")
-        run(readFolder, _logger)
+        cases = get_all_files(SCRAPED_DIR)
+        run_v2(logger, cases)
+
+    # run(unhandledFolder, logger, min_delay=0)
+    # while True:
+    #     logger.info("parser is starting")
+        # run(readFolder, logger)
 
 
 if __name__ == '__main__':

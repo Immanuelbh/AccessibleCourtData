@@ -2,7 +2,7 @@ from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
-from hcva.utils.path import get_path, sep
+from hcva.utils.path import get_path, sep, get_all_files
 from elasticsearch import Elasticsearch
 import os
 import glob
@@ -31,10 +31,6 @@ def flush(files, directory):
     for file in files:
         source = get_source(file)
         shutil.move(source, destination)
-
-
-def get_all_files(folder_name):
-    return [f for f in glob.glob(folder_name + "/*.json")]
 
 
 class Elastic:
@@ -114,7 +110,7 @@ def main():
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
-        print("{} index created successfully".format(ELASTIC_INDEX))
+        logger.info(f"{ELASTIC_INDEX} index created successfully")
         while True:
             elastic.run()
             elastic.flush_all()
