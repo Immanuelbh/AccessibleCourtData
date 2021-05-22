@@ -1,22 +1,43 @@
-from os import environ
+from os import path, curdir
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
-DB_URI = "mongodb://root:example@localhost:27017/SupremeCourt?authSource=admin"
-# DB_URI = environ.get('MONGO_DB_URI')
+from hcva.utils.date import init_dates
+from hcva.utils.logger import Logger
+
+DB_NAME = 'hcva'
+DB_URI = f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
+# DB_URI = os.environ.get('MONGO_DB_URI')
+ROOT_DIR = path.abspath(curdir)
+log_path = ROOT_DIR + f'/logs/{DB_NAME}/'
+
+
+def create_docs():
+    docs = []
+    dates = init_dates()
+    for date in dates:
+        doc = {
+            'date': date,
+            'status': 'available'
+        }
+        docs.append(doc)
+
+    return docs
 
 
 class Database:
-    def __init__(self, logger):
-        self.logger = logger
+    logger = Logger('db.log', log_path).get_logger()
+    collection = None
+
+    def __init__(self):
         self.client = MongoClient(DB_URI)
         self.get_connection()
 
     def get_connection(self):
         try:
-            self.log('db trying to connect...')
+            self.logger.info('db trying to connect...')
             connection = self.client
-            self.log('db connected')
+            self.logger.info('db connected')
         except ServerSelectionTimeoutError as err:
             message = 'db connection Timeout - check for if this machine ip is on whitelist'
             if self.logger is not None:
@@ -26,17 +47,54 @@ class Database:
             connection = None
         return connection
 
-    def get_db(self, db_name='hcva'):
-        self.log(f'db trying to get db: {db_name}')
-        db = self.client[db_name]
-        self.log(f'got db: {db.name}')
+    def get_db(self, name):
+        self.logger.info(f'db trying to get db: {name}')
+        db = self.client[name]
+        self.logger.info(f'got db: {db.name}')
         return db
 
-    def getCollection(self, db, collectionName):
-        collection = db.get_collection(collectionName)
-        self.log(f'got collection: {collectionName}')
+    def get_collection(self, db, collection_name):
+        collection = db.get_collection(collection_name)
+        self.logger.info(f'got collection: {collection_name}')
         return collection
 
-    def log(self, message):
-        if self.logger is not None:
-            self.logger.info(message)
+    # date format: %d-%m-%Y
+    def update_status(self, date, status):
+        self.logger.info(f'setting {date} status to: {status}')
+        self.collection.update_one({
+            'date': date
+        }, {
+            '$set': {
+                'status': status
+            }
+        })
+
+    def create_date(self, date):
+        self.collection.insert({
+            'date': date,
+            'status': 'available'
+        })
+
+    def get_dates(self):
+        res = self.collection.find({
+            'status': 'available'
+        }, {
+            '_id': 0,
+            'status': 0
+        })
+        self.logger.info(f'found {res.count()}')
+        return res
+
+    def create_collection(self):
+        docs = create_docs()
+        self.collection.insert_many(docs)
+
+    def init_collection(self, db_name, collection_name):
+        self.collection = self.client[db_name].get_collection(collection_name)
+        if self.collection.count() == 0:
+            self.logger.info(f'initializing collection: {collection_name}')
+            self.create_collection()
+
+        self.logger.info(f'collection @{collection_name} initialized')
+
+        return self.collection
