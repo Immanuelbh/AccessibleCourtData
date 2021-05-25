@@ -2,7 +2,7 @@ from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
-from hcva.utils.path import get_path, sep, get_all_files
+from hcva.utils.path import get_all_files
 from elasticsearch import Elasticsearch
 import os
 import shutil
@@ -62,6 +62,7 @@ class Elastic:
 
     def run(self):
         products = get_all_files(folder_name=ROOT_DIR + PARSED_DIR)
+        self._logger.info(f'trying to upload {len(products)} cases')
         self.index_with_schema(products)
 
     def flush_all(self):
@@ -110,7 +111,7 @@ class Elastic:
 
 
 def main():
-    logger = Logger('elasticsearch.log', get_path(n=2) + f'logs{sep}').get_logger()
+    logger = Logger('elasticsearch.log', LOG_DIR).get_logger()
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
