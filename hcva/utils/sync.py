@@ -20,10 +20,6 @@ uploadFolders = {handledFolder: handledFolder,
 downloadFolders = [handledFolder, backupFolder]
 
 
-for f in [handledFolder, unhandledFolder, backupFolder, unBackupFolder, elasticFolder]:
-    create_dir(f)
-
-
 def get_folder_name(folder):
     return folder.split(sep)[-2]
 

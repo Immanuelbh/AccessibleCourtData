@@ -1,4 +1,3 @@
-from hcva.elastic.builder import *
 from hcva.elastic.validation.json_validator import *
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
@@ -43,6 +42,24 @@ def save(files, directory):
     for file in files:
         d = read_data(file, PARSED_DIR)
         save_data(d, file, destination)
+
+
+def build_elasticsearch_id(json_id):
+    initial_id = build_an_initial_id(json_id)
+    elasticsearch_id = build_first_continuous_number(initial_id)
+    return elasticsearch_id
+
+
+def build_an_initial_id(json_id):
+    initial_id = json_id.split(" ")[1]  # Acceptance only of procedure number without court type
+    initial_id = initial_id.replace("/", "-")  # Change the procedure number format from 'xxxx/xx' to 'xxxx-xx'
+    return initial_id
+
+
+def build_first_continuous_number(initial_id):
+    first_continuous_number = 1  # Set an initial runner number to a procedure number
+    elasticsearch_id = f"{initial_id}-{first_continuous_number}"
+    return elasticsearch_id
 
 
 class Elastic:
