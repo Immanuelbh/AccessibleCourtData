@@ -1,22 +1,20 @@
 import sys
-
+import jsonschema
+import json
 from hcva.elastic.v5.relative_path import get_path
 
 sys.path.insert(1, '../..')
 
-import jsonschema
-import json
-
 DEFAULT_SCHEMA = get_path('json_schema/json_schema.json')
 
 
-def validate_v1(dataFile, schemaFile=DEFAULT_SCHEMA):
+def validate_v1(data_file, schema_file=DEFAULT_SCHEMA):
     try:
-        with open(dataFile, encoding='utf-8') as dataToElastic:
-            elasticData = json.load(dataToElastic)
-        with open(schemaFile, encoding='utf-8') as jsonSchema:
-            schema = json.load(jsonSchema)
-        if jsonschema.validate(elasticData, schema) is None:
+        with open(data_file, encoding='utf-8') as data_to_elastic:
+            elastic_data = json.load(data_to_elastic)
+        with open(schema_file, encoding='utf-8') as json_schema:
+            schema = json.load(json_schema)
+        if jsonschema.validate(elastic_data, schema) is None:
             return True
         else:
             return False
@@ -24,10 +22,10 @@ def validate_v1(dataFile, schemaFile=DEFAULT_SCHEMA):
         return False
 
 
-def validate_v2(dataObject, schemaFile=DEFAULT_SCHEMA):
-    with open(schemaFile, encoding='utf-8') as jsonSchema:
-        schema = json.load(jsonSchema)
-    if jsonschema.validate(dataObject, schema) is None:
+def validate_v2(data_object, schema_file=DEFAULT_SCHEMA):
+    with open(schema_file, encoding='utf-8') as json_schema:
+        schema = json.load(json_schema)
+    if jsonschema.validate(data_object, schema) is None:
         return True
     else:
         return False

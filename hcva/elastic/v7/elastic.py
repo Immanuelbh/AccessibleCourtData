@@ -1,5 +1,6 @@
 from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
+from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.path import get_all_files
@@ -37,6 +38,13 @@ def flush(files, directory):
         shutil.move(source, destination)
 
 
+def save(files, directory):
+    destination = get_destination(directory)
+    for file in files:
+        d = read_data(file, PARSED_DIR)
+        save_data(d, file, destination)
+
+
 class Elastic:
     failed_upload = []
     failed_validation = []
@@ -72,14 +80,21 @@ class Elastic:
         flush(self.failed_validation, FAILED_VALIDATION_DIR)
         self._logger.info("all files flushed")
 
+    def save_all(self):
+        self._logger.info("saving results")
+        save(self.success_upload, SUCCESS_DIR)
+        save(self.failed_upload, FAILED_UPLOAD_DIR)
+        save(self.failed_validation, FAILED_VALIDATION_DIR)
+        self._logger.info("all files saved")
+
     def index_with_schema(self, products):
         for product in products:
             file_name = os.path.basename(product)
             self._logger.info("trying to validate {}".format(file_name))
-            if validate_v1(dataFile=product):
+            if validate_v1(data_file=product):
                 self._logger.info("file is valid")
-                id, data = self.extract_data(product)
-                res = self.upload(id, data)
+                id_, data = self.extract_data(product)
+                res = self.upload(id_, data)
                 if res:
                     self.success_upload.append(file_name)
                 else:
@@ -103,9 +118,9 @@ class Elastic:
                 self._logger.info("error while trying to load file")
                 return None, None
 
-    def upload(self, id, data):
+    def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=ELASTIC_INDEX, id=id, body=data)
+        res = self.elastic.index(index=ELASTIC_INDEX, id=id_, body=data)
         self._logger.info("file {}".format(res['result']))
         return res
 
@@ -118,7 +133,8 @@ def main():
         logger.info(f"{ELASTIC_INDEX} index created successfully")
         while True:
             elastic.run()
-            elastic.flush_all()
+            elastic.save_all()
+            # elastic.flush_all()
             call_sleep(logger=logger, minutes=10)
 
 
