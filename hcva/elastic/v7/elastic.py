@@ -2,26 +2,30 @@ from hcva.elastic.builder import *
 from hcva.elastic.json_validator import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
-from hcva.utils.path import get_path, sep
+from hcva.utils.path import get_path, sep, get_all_files
 from elasticsearch import Elasticsearch
 import os
-import glob
 import shutil
 import sys
 sys.path.insert(1, '../../..')
 
+DB_NAME = 'hcva'
 ELASTIC_INDEX = 'test_index_1'
 ROOT_DIR = os.path.abspath(os.curdir)
-HANDLED_DIR = "/products/handled_json_products/"
+LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
+PARSED_DIR = ROOT_DIR + "/cases/parsed/success/"
+SUCCESS_DIR = "success_upload/"
+FAILED_VALIDATION_DIR = "failed_validation"
+FAILED_UPLOAD_DIR = "failed_upload"
 
 
 def get_source(file_name):
-    source = ROOT_DIR + HANDLED_DIR + file_name
+    source = ROOT_DIR + PARSED_DIR + file_name
     return source
 
 
 def get_destination(directory):
-    destination = ROOT_DIR + "/products/" + directory
+    destination = ROOT_DIR + "/cases/elastic" + directory
     os.makedirs(destination, exist_ok=True)
     return destination
 
@@ -31,10 +35,6 @@ def flush(files, directory):
     for file in files:
         source = get_source(file)
         shutil.move(source, destination)
-
-
-def get_all_files(folder_name):
-    return [f for f in glob.glob(folder_name + "/*.json")]
 
 
 class Elastic:
@@ -61,14 +61,14 @@ class Elastic:
                 self._logger.error("Error creating index")
 
     def run(self):
-        products = get_all_files(folder_name=ROOT_DIR + HANDLED_DIR)
+        products = get_all_files(folder_name=ROOT_DIR + PARSED_DIR)
         self.index_with_schema(products)
 
     def flush_all(self):
         self._logger.info("flushing folder")
-        flush(self.success_upload, "elastic/success_upload")
-        flush(self.failed_upload, "elastic/failed_upload")
-        flush(self.failed_validation, "elastic/failed_validation")
+        flush(self.success_upload, SUCCESS_DIR)
+        flush(self.failed_upload, FAILED_UPLOAD_DIR)
+        flush(self.failed_validation, FAILED_VALIDATION_DIR)
         self._logger.info("all files flushed")
 
     def index_with_schema(self, products):
@@ -114,11 +114,11 @@ def main():
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
-        print("{} index created successfully".format(ELASTIC_INDEX))
+        logger.info(f"{ELASTIC_INDEX} index created successfully")
         while True:
             elastic.run()
             elastic.flush_all()
-            call_sleep(logger=logger, minutes=10)  # after finished with all the files, wait - hours * minutes * seconds
+            call_sleep(logger=logger, minutes=10)
 
 
 if __name__ == '__main__':

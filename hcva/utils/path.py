@@ -19,6 +19,10 @@ def get_files(folder_path, file_type='json'):
     return [f for f in glob(folder_path + "*." + file_type)]
 
 
+def get_all_files(folder_name):
+    return [f for f in glob(folder_name + "/*.json")]
+
+
 # input - if dirName is string create folder at current path else create all the path
 def create_dir(dir_name, logger=None):
     try:

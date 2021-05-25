@@ -1,14 +1,16 @@
+from os import path, curdir
 from hcva.utils.logger import Logger
-from hcva.utils.time import call_sleep
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, sep, create_dir, get_files, remove
+from hcva.utils.path import create_dir, remove, get_all_files
+from hcva.utils.time import call_sleep
 
-readFolder = get_path(n=0) + f'products{sep}json_products{sep}'
-handledFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
-unhandledFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
-
-for f in [readFolder, handledFolder, unhandledFolder]:
-    create_dir(f)
+DB_NAME = 'hcva'
+ROOT_DIR = path.abspath(curdir)
+LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
+SCRAPED_DIR = ROOT_DIR + "/cases/scraped/"
+SUCCESS_DIR = ROOT_DIR + "/cases/parsed/success/"
+FAILED_VALIDATION_DIR = ROOT_DIR + "/cases/parsed/failed_validation/"
+FAILED_PARSE_DIR = ROOT_DIR + "/cases/parsed/failed_parse/"
 
 
 def clean_spaces(text):
@@ -42,7 +44,7 @@ def clean_spaces(text):
     return "".join(temp_list)  # rejoin the set of characters
 
 
-def makeSureNoNumber(line, minimum=1, maximum=200):
+def make_sure_no_number(line, minimum=1, maximum=200):
     for number in range(minimum, maximum):
         if str(number) in line:
             line = line.replace(str(number), '')
@@ -51,32 +53,32 @@ def makeSureNoNumber(line, minimum=1, maximum=200):
 
 def drop_extra_info(text, minimum=1, maximum=5):
     product = list()
-    EOFSign = '__'
-    startWord = 'לפני'
-    keyInLineSign = ':'
-    bannedWords = ['נגד', 'נ ג ד', 'ש ו פ ט ת', 'ש ו פ ט', 'ר ש ם', 'ר ש מ ת', 'ה נ ש י א ה', 'ה נ ש י א']
+    eof_sign = '__'
+    start_word = 'לפני'
+    key_in_line_sign = ':'
+    banned_words = ['נגד', 'נ ג ד', 'ש ו פ ט ת', 'ש ו פ ט', 'ר ש ם', 'ר ש מ ת', 'ה נ ש י א ה', 'ה נ ש י א']
     temp = clean_spaces(text)
     for index in range(len(temp)):
-        if EOFSign in temp[index]:  # we got all we want lets pack it and go back
+        if eof_sign in temp[index]:  # we got all we want lets pack it and go back
             return "\n".join(product)
-        elif keyInLineSign in temp[index] or startWord in temp[index]:  # In case we have more rows between row 0 to judges names
+        elif key_in_line_sign in temp[index] or start_word in temp[index]:  # In case we have more rows between row 0 to judges names
             maximum = index
 
         if index not in range(minimum, maximum):  # Include all but unnecessary information
-            doBreak = False
-            for word in bannedWords:
+            do_break = False
+            for word in banned_words:
                 if word in temp[index]:
-                    doBreak = True
+                    do_break = True
                     break
-            if doBreak:
+            if do_break:
                 continue
             product.append(temp[index])
     return '\n'.join(product)  # rejoin all the line of the text
 
 
-def removeWords(values):
-    removeWord = ['כבוד', 'השופטת', 'השופט', 'הרשמת', 'הרשם', 'המשנה לנשיאה', 'המשנה לנשיא', 'הנשיאה', 'הנשיא']
-    for word in removeWord:
+def remove_words(values):
+    remove_word = ['כבוד', 'השופטת', 'השופט', 'הרשמת', 'הרשם', 'המשנה לנשיאה', 'המשנה לנשיא', 'הנשיאה', 'הנשיא']
+    for word in remove_word:
         if type(values) is list:
             for index in range(len(values)):
                 values[index] = values[index].replace(word, '')
@@ -86,20 +88,20 @@ def removeWords(values):
     return values
 
 
-def isThereMore(line, oldValues=None, key=';'):
-    oldValues = list() if oldValues is None else oldValues
+def is_there_more(line, old_values=None, key=';'):
+    old_values = list() if old_values is None else old_values
     if key in line:
         values = line.split(key)
         for index in range(len(values)):
             values[index] = clean_spaces(values[index])
-        oldValues.extend(removeWords(values))
+        old_values.extend(remove_words(values))
     else:
-        oldValues.append(removeWords(line))
-    return oldValues
+        old_values.append(remove_words(line))
+    return old_values
 
 
-def get_Key(tempKey):
-    tempKey = makeSureNoNumber(tempKey)
+def get_key(temp_key):
+    temp_key = make_sure_no_number(temp_key)
     temp_dict = {
         'לפני': ['לפני', 'בפני'],
         'בשם העותר': ['בשם המערערים', 'בשם המערער', 'בשם המערערת', 'בשם המערערות',
@@ -126,174 +128,190 @@ def get_Key(tempKey):
     }
 
     for key, item in temp_dict.items():
-        if tempKey in item:
+        if temp_key in item:
             return key
     for key, item in temp_dict.items():
         for possibleKey in item:
-            if possibleKey in tempKey:
+            if possibleKey in temp_key:
                 return key
 
     return None  # if it get here we missing some keys or No key in given tempKey
 
 
-def gotVerdict(line):
-    verdictKeyList = ['החלטה', 'פסק-דין', 'פסק דין', 'צו-על-תנאי']
-    for key in verdictKeyList:
+def got_verdict(line):
+    verdict_key_list = ['החלטה', 'פסק-דין', 'פסק דין', 'צו-על-תנאי']
+    for key in verdict_key_list:
         if key in line:
             return True, key
     return False, None
 
 
-def gotExtraInformation(line):
-    ExtraInformationKeys = ['בקשה', 'ערעור', 'העברת מקום דיון', 'הגשת עיקרי טיעון', 'צו על תנאי']
-    for key in ExtraInformationKeys:
+def got_extra_information(line):
+    extra_information_keys = ['בקשה', 'ערעור', 'העברת מקום דיון', 'הגשת עיקרי טיעון', 'צו על תנאי']
+    for key in extra_information_keys:
         if key in line:
             return True
     return False
 
 
-def getKeyList(mustHave=True):
-    if mustHave:
+def get_key_list(must_have=True):
+    if must_have:
         return ['לפני', 'העותר', 'המשיב', 'מספר הליך', 'סוג מסמך', 'סיכום']
     return ['מידע נוסף', 'בשם העותר', 'בשם המשיב']
 
 
-def iGotItAll(tempDict, keyList):
-    for key in keyList:
-        if key in tempDict.keys():
-            if tempDict[key] is None:
+def i_got_it_all(temp_dict, key_list):
+    for key in key_list:
+        if key in temp_dict.keys():
+            if temp_dict[key] is None:
                 return False
         else:
             return False
     return True
 
 
-def parser(caseText):
+def parser(case_text):
     doc_dict = dict()
-    addToken, moreInfoToken, tempKey, valuesList, numOfValues, linesToSkip = False, False, None, None, 1, []
-    caseText = drop_extra_info(caseText)
-    verdictLines = caseText.splitlines()
-    doc_dict['מספר הליך'] = verdictLines[0]
-    N = len(verdictLines)
-    for index in range(1, N):
-        if index in linesToSkip:
+    add_token, more_info_token, temp_key, values_list, num_of_values, lines_to_skip = False, False, None, None, 1, []
+    case_text = drop_extra_info(case_text)
+    verdict_lines = case_text.splitlines()
+    doc_dict['מספר הליך'] = verdict_lines[0]
+    n = len(verdict_lines)
+    for index in range(1, n):
+        if index in lines_to_skip:
             continue
-        elif ':' in verdictLines[index] or get_Key(verdictLines[index]) is not None:  # we got a key
-            if addToken:  # finished getting values for previous key
-                key = get_Key(tempKey)
+        elif ':' in verdict_lines[index] or get_key(verdict_lines[index]) is not None:  # we got a key
+            if add_token:  # finished getting values for previous key
+                key = get_key(temp_key)
                 if key not in doc_dict.keys():
-                    doc_dict[key] = valuesList
+                    doc_dict[key] = values_list
                 else:
-                    doc_dict[key].extend(valuesList)
-                numOfValues = 1
-            valuesList = list()  # start gather values for found key
-            temp_list = verdictLines[index].split(':')
-            tempKey = temp_list[0]
-            addToken = True
+                    doc_dict[key].extend(values_list)
+                num_of_values = 1
+            values_list = list()  # start gather values for found key
+            temp_list = verdict_lines[index].split(':')
+            temp_key = temp_list[0]
+            add_token = True
             if len(temp_list) > 1:
                 if len(temp_list[1]) > 0:
-                    valuesList.append(temp_list[1])
-        elif gotVerdict(verdictLines[index])[0]:  # what remain is verdict text
-            key = get_Key(tempKey)
-            doc_dict[key] = valuesList
-            doc_dict['סוג מסמך'] = gotVerdict(verdictLines[index])[1]
-            doc_dict['סיכום'] = "\n".join(verdictLines[index + 1:])
+                    values_list.append(temp_list[1])
+        elif got_verdict(verdict_lines[index])[0]:  # what remain is verdict text
+            key = get_key(temp_key)
+            doc_dict[key] = values_list
+            doc_dict['סוג מסמך'] = got_verdict(verdict_lines[index])[1]
+            doc_dict['סיכום'] = "\n".join(verdict_lines[index + 1:])
             break
         else:  # get another values for key or get extra text pre verdict
-            strValue = f"{numOfValues}. "  # string to replace in ordered values
-            if strValue in verdictLines[index]:  # if we got another value to add
-                numOfValues += 1  # increment value for next in order
-                valuesList.append(verdictLines[index].replace(strValue, ''))  # remove the number + dot + space from the new value
-            elif gotExtraInformation(verdictLines[index]):  # if we got extra info
-                extraInfoValues = verdictLines[index]
-                while index + 1 < N:  # start gather all extra info in coming rows
-                    if ":" in verdictLines[index + 1]: # if we finished with extra info
-                        if "תאריך הישיבה:" not in verdictLines[index + 1]:  # private case of extra info
-                            if get_Key(verdictLines[index + 1].split(':')[0]) is not None:
+            str_value = f"{num_of_values}. "  # string to replace in ordered values
+            if str_value in verdict_lines[index]:  # if we got another value to add
+                num_of_values += 1  # increment value for next in order
+                values_list.append(verdict_lines[index].replace(str_value, ''))  # remove the number + dot + space from the new value
+            elif got_extra_information(verdict_lines[index]):  # if we got extra info
+                extra_info_values = verdict_lines[index]
+                while index + 1 < n:  # start gather all extra info in coming rows
+                    if ":" in verdict_lines[index + 1]: # if we finished with extra info
+                        if "תאריך הישיבה:" not in verdict_lines[index + 1]:  # private case of extra info
+                            if get_key(verdict_lines[index + 1].split(':')[0]) is not None:
                                 break
-                    elif gotVerdict(verdictLines[index+1])[0]:
+                    elif got_verdict(verdict_lines[index + 1])[0]:
                         break
 
                     index += 1
-                    linesToSkip.append(index)  # make list of lines we added
-                    extraInfoValues += f";{verdictLines[index]}"  # concatenate value to string
-                doc_dict['מידע נוסף'] = isThereMore(extraInfoValues)  # get list from the string we built
+                    lines_to_skip.append(index)  # make list of lines we added
+                    extra_info_values += f";{verdict_lines[index]}"  # concatenate value to string
+                doc_dict['מידע נוסף'] = is_there_more(extra_info_values)  # get list from the string we built
             else:  # add new value\s to the list
-                valuesList = isThereMore(verdictLines[index], valuesList)
+                values_list = is_there_more(verdict_lines[index], values_list)
 
-    if iGotItAll(doc_dict, getKeyList()):
-        for key in getKeyList(mustHave=False):
+    if i_got_it_all(doc_dict, get_key_list()):
+        for key in get_key_list(must_have=False):
             if key not in doc_dict.keys():
                 doc_dict[key] = list()
             if None in doc_dict.keys():
-                return caseText, False
+                return case_text, False
         return doc_dict, True
-    return caseText, False
+    return case_text, False
 
 
-def moveFile(data, fileName, sourceFolder, destFolder):
-    remove(fileName)  # delete old copy
-    fileName = fileName.replace(sourceFolder, '')  # extract file name
-    save_data(data, fileName, destFolder)  # save new copy
+def move_file(data, file_name, source_folder, dest_folder):
+    remove(file_name)  # delete old copy
+    file_name = file_name.replace(source_folder, '')  # extract file name
+    save_data(data, file_name, dest_folder)  # save new copy
 
 
-def run(folder, logger=None, minDelay=10):
-    listOfFiles = get_files(folder_path=folder)
-    message = f"Got {len(listOfFiles)} files to parse."
-    logger.info(message) if logger is not None else print(message)
-    if len(listOfFiles) > 0:
-        index = 0
-        counter = 0
-        skipCounter = 0
-        for fileName in listOfFiles:
-            try:
-                index += 1
-                message = f"Starting to parse file {index} of {len(listOfFiles)}... "
-                logger.info(message) if logger is not None else print(message, end='')
-                doc = read_data('', fileName)  # fileName include path and os.sep not needed
-                if len(doc) < 1:  # private case - we got empty file
-                    message = "Skipped because len"
-                    logger.info(message) if logger is not None else print(message)
-                    skipCounter += 1
-                    moveFile(doc, fileName, folder, unhandledFolder)
-                    continue
-                elif 'פני:' not in str(doc['Doc Details']):  # old type of case
-                    message = "Skipped because missing key"
-                    logger.info(message) if logger is not None else print(message)
-                    skipCounter += 1
-                    moveFile(doc, fileName, folder, unhandledFolder)
-                    continue
-                doc['Doc Details'], succeed = parser(doc['Doc Details'])  # if succeed Dict, else text
-                writeFolder = handledFolder if succeed else unhandledFolder
+def parse(case):
+    case['Doc Details'], success = parser(case['Doc Details'])  # if succeed Dict, else text
+    if success:
+        for key in case['Doc Info']:
+            case['Doc Details'][key] = case['Doc Info'][key] if key != 'עמודים' \
+                else [int(s) for s in case['Doc Info'][key].split() if s.isdigit()][0]
+        case.pop('Doc Info', None)
+        return case
 
-                if succeed:
-                    # insert info data into doc details and remove old duplicate
-                    for key in doc['Doc Info']:
-                        doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
-                            else [int(s) for s in doc['Doc Info'][key].split() if s.isdigit()][0]
-                    doc.pop('Doc Info', None)
-                    counter += 1
-                    logger.info(f"File {index} succeed") if logger is not None else print('Succeed')
-                else:
-                    logger.info(f"File {index} failed") if logger is not None else print('Failed')
-                moveFile(doc, fileName, folder, writeFolder)
-            except:
-                pass
-        message = f"{counter} files Succeed, {skipCounter} files Skipped, {len(listOfFiles) - counter - skipCounter} files Failed, Total {len(listOfFiles)} files"
-        logger.info(message) if logger is not None else print(message)
+    return None
 
-    else:
-        logger.info('Parser finished his job.') if logger is not None else print('Parser finished his job.')
-        call_sleep(logger=logger, minutes=minDelay)  # after finished with all the files wait a bit - hours * minutes * seconds
+
+def is_valid(case):
+    if len(case) < 1:
+        return False
+    elif not case['Doc Details']:
+        return False
+    elif 'פני:' not in str(case['Doc Details']):
+        return False
+
+    return True
+
+
+def run(logger, cases):
+    if not cases:
+        logger.info(f'no cases to parse')
+        return
+
+    logger.info(f'parsing {len(cases)} cases')
+    for case in cases:
+        logger.info(f'trying to parse {case}...')
+        c = read_data(case, SCRAPED_DIR)
+        if c and is_valid(c):
+            logger.info(f'read {case} successfully')
+            p = parse(c)
+            if p:
+                logger.info(f'parsed {case} successfully')
+                save_data(p, case, SUCCESS_DIR)
+                logger.info(f'saved {case} to {SUCCESS_DIR}')
+            else:
+                logger.info(f'failed to parse {case}')
+                save_data(c, case, FAILED_PARSE_DIR)
+        else:
+            logger.info(f'failed to read {case}: case not valid')
+            save_data(c, case, FAILED_VALIDATION_DIR)
+    # TODO remove file from scraped?
+    logger.info(f'finished parsing {len(cases)} cases')
+
+
+def get_names(files):
+    names = []
+    for file in files:
+        s = file.split("/")
+        n = s[len(s)-1]
+        names.append(n)
+    return names
+
+
+def get_cases(path_):
+    files = get_all_files(path_)
+    return get_names(files)
 
 
 def main():
-    _logger = Logger('parser.log', get_path(n=0) + f'logs{sep}').get_logger()
-    _logger.info("Parser is Starting")
-    run(unhandledFolder, _logger, minDelay=0)
+    logger = Logger('parser.log', LOG_DIR).get_logger()
+    logger.info("parser is starting")
+    create_dir(SUCCESS_DIR)
+    create_dir(FAILED_VALIDATION_DIR)
+    create_dir(FAILED_PARSE_DIR)
     while True:
-        _logger.info("Parser is Starting")
-        run(readFolder, _logger)
+        cases = get_cases(SCRAPED_DIR)
+        run(logger, cases)
+        call_sleep(logger=logger, minutes=10)
 
 
 if __name__ == '__main__':

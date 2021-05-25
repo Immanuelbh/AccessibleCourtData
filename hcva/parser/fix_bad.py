@@ -5,7 +5,7 @@ readFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
 writeFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
 
 
-def fixSchema(doc):
+def fix_schema(doc):
     for key in doc['Doc Info']:
         doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
             else [int(s) for s in doc['Doc Info'][key].split() if s.isdigit()][0]
@@ -13,19 +13,19 @@ def fixSchema(doc):
     return doc
 
 
-def moveFile(data, fileName, sourceFolder, destFolder):
-    remove(fileName)  # delete old copy
-    fileName = fileName.replace(sourceFolder, '')  # extract file name
-    save_data(data, fileName, destFolder)  # save new copy
+def move_file(data, file_name, source_folder, dest_folder):
+    remove(file_name)  # delete old copy
+    file_name = file_name.replace(source_folder, '')  # extract file name
+    save_data(data, file_name, dest_folder)  # save new copy
 
 
 def run():
-    listOfFiles = get_files(folder_path=readFolder)
-    for fileName in listOfFiles:
+    list_of_files = get_files(folder_path=readFolder)
+    for fileName in list_of_files:
         doc = read_data('', fileName)  # fileName include path and os.sep not needed
         if 'לפני' in doc['Doc Details'].keys():
-            doc = fixSchema(doc)
-            moveFile(doc, fileName, readFolder, writeFolder)
+            doc = fix_schema(doc)
+            move_file(doc, fileName, readFolder, writeFolder)
 
 
 run()
