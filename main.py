@@ -1,12 +1,12 @@
 import sys
 from hcva.elastic.v7.elastic import main as elastic
-from hcva.parser.parser import main as parser_main
+from hcva.parser.parser import main as parser
 from hcva.utils.sync import upload_sync, download_sync
 from hcva.scraper.app import main as scraper
 
 if __name__ == '__main__':
     functions = {1: scraper,
-                 2: parser_main,
+                 2: parser,
                  3: elastic,
                  4: upload_sync,
                  5: download_sync,

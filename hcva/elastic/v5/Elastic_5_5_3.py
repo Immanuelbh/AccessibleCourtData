@@ -5,7 +5,7 @@ import glob
 import requests
 from time import sleep
 from hcva.elastic.v5.Moving import Moving
-from hcva.elastic.json_validator import *
+from hcva.elastic.validation.json_validator import *
 from hcva.elastic.v5.internet import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
@@ -71,7 +71,7 @@ class Elastic_5_5_3:
 
             file_name = os.path.basename(product)
             self._logger.info("Begins file verification")
-            if validate_v1(dataFile=product):
+            if validate_v1(data_file=product):
                 self._logger.info("File approved")
                 self._logger.info("Handles file # {} by name {}".format(idx, file_name))
                 ack = False
