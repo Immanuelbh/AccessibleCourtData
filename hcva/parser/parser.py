@@ -1,7 +1,8 @@
 from os import path, curdir
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, create_dir, remove, get_all_files
+from hcva.utils.path import create_dir, remove, get_all_files
+from hcva.utils.time import call_sleep
 
 DB_NAME = 'hcva'
 ROOT_DIR = path.abspath(curdir)
@@ -261,7 +262,7 @@ def is_valid(case):
     return True
 
 
-def run_v2(logger, cases):
+def run(logger, cases):
     if not cases:
         logger.info(f'no cases to parse')
         return
@@ -309,7 +310,8 @@ def main():
     create_dir(FAILED_PARSE_DIR)
     while True:
         cases = get_cases(SCRAPED_DIR)
-        run_v2(logger, cases)
+        run(logger, cases)
+        call_sleep(logger=logger, minutes=10)
 
 
 if __name__ == '__main__':
