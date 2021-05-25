@@ -5,7 +5,7 @@ import glob
 import requests
 from time import sleep
 from hcva.elastic.v5.Moving import Moving
-from hcva.elastic.json_validator import *
+from hcva.elastic.validation.json_validator import *
 from hcva.elastic.v5.internet import *
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep

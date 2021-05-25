@@ -1,5 +1,5 @@
 from hcva.elastic.builder import *
-from hcva.elastic.json_validator import *
+from hcva.elastic.validation.json_validator import *
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
@@ -96,6 +96,7 @@ class Elastic:
                 id_, data = self.extract_data(product)
                 res = self.upload(id_, data)
                 if res:
+                    self._logger.info(f'{product} was uploaded to elasticsearch successfully')
                     self.success_upload.append(file_name)
                 else:
                     self._logger.info("adding file to failed list")
@@ -121,7 +122,7 @@ class Elastic:
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
         res = self.elastic.index(index=ELASTIC_INDEX, id=id_, body=data)
-        self._logger.info("file {}".format(res['result']))
+        self._logger.info(f"file {res['result']}")
         return res
 
 
