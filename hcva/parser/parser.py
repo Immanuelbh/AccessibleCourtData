@@ -1,18 +1,13 @@
+from os import path, curdir
 from hcva.utils.logger import Logger
-from hcva.utils.time import call_sleep
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, sep, create_dir, get_files, remove, get_all_files
+from hcva.utils.path import get_path, create_dir, remove, get_all_files
 
-readFolder = get_path(n=0) + f'products{sep}json_products{sep}'
-handledFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
-unhandledFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
-
-SCRAPED_DIR = "/cases/scraped/"
-PARSED_DIR = "/cases/parsed/"
-
-
-for f in [readFolder, handledFolder, unhandledFolder]:
-    create_dir(f)
+ROOT_DIR = path.abspath(curdir)
+SCRAPED_DIR = ROOT_DIR + "/cases/scraped/"
+SUCCESS_DIR = ROOT_DIR + "/cases/parsed/success/"
+FAILED_VALIDATION_DIR = ROOT_DIR + "/cases/parsed/failed_validation/"
+FAILED_PARSE_DIR = ROOT_DIR + "/cases/parsed/failed_parse/"
 
 
 def clean_spaces(text):
@@ -241,58 +236,27 @@ def move_file(data, file_name, source_folder, dest_folder):
     save_data(data, file_name, dest_folder)  # save new copy
 
 
-def run(folder, logger=None, min_delay=10):
-    list_of_files = get_files(folder_path=folder)
-    message = f"Got {len(list_of_files)} files to parse."
-    logger.info(message) if logger is not None else print(message)
-    if len(list_of_files) > 0:
-        index = 0
-        counter = 0
-        skip_counter = 0
-        for fileName in list_of_files:
-            try:
-                index += 1
-                message = f"Starting to parse file {index} of {len(list_of_files)}... "
-                logger.info(message) if logger is not None else print(message, end='')
-                doc = read_data('', fileName)  # fileName include path and os.sep not needed
-                if len(doc) < 1:  # private case - we got empty file
-                    message = "Skipped because len"
-                    logger.info(message) if logger is not None else print(message)
-                    skip_counter += 1
-                    move_file(doc, fileName, folder, unhandledFolder)
-                    continue
-                elif 'פני:' not in str(doc['Doc Details']):  # old type of case
-                    message = "Skipped because missing key"
-                    logger.info(message) if logger is not None else print(message)
-                    skip_counter += 1
-                    move_file(doc, fileName, folder, unhandledFolder)
-                    continue
-                doc['Doc Details'], succeed = parser(doc['Doc Details'])  # if succeed Dict, else text
-                write_folder = handledFolder if succeed else unhandledFolder
-
-                if succeed:
-                    # insert info data into doc details and remove old duplicate
-                    for key in doc['Doc Info']:
-                        doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
-                            else [int(s) for s in doc['Doc Info'][key].split() if s.isdigit()][0]
-                    doc.pop('Doc Info', None)
-                    counter += 1
-                    logger.info(f"File {index} succeed") if logger is not None else print('Succeed')
-                else:
-                    logger.info(f"File {index} failed") if logger is not None else print('Failed')
-                move_file(doc, fileName, folder, write_folder)
-            except:
-                pass
-        message = f"{counter} files Succeed, {skip_counter} files Skipped, {len(list_of_files) - counter - skip_counter} files Failed, Total {len(list_of_files)} files"
-        logger.info(message) if logger is not None else print(message)
-
-    else:
-        logger.info('Parser finished his job.') if logger is not None else print('Parser finished his job.')
-        call_sleep(logger=logger, minutes=min_delay)  # after finished with all the files wait a bit - hours * minutes * seconds
-
-
 def parse(case):
-    return 'parse'
+    case['Doc Details'], success = parser(case['Doc Details'])  # if succeed Dict, else text
+    if success:
+        for key in case['Doc Info']:
+            case['Doc Details'][key] = case['Doc Info'][key] if key != 'עמודים' \
+                else [int(s) for s in case['Doc Info'][key].split() if s.isdigit()][0]
+        case.pop('Doc Info', None)
+        return case
+
+    return None
+
+
+def is_valid(case):
+    if len(case) < 1:
+        return False
+    elif not case['Doc Details']:
+        return False
+    elif 'פני:' not in str(case['Doc Details']):
+        return False
+
+    return True
 
 
 def run_v2(logger, cases):
@@ -300,65 +264,50 @@ def run_v2(logger, cases):
         logger.info(f'no cases to parse')
         return
 
-    logger.info(f'parsing f{len(cases)} cases')
+    logger.info(f'parsing {len(cases)} cases')
     for case in cases:
         logger.info(f'trying to parse {case}...')
-        c = read_data(case)
-        if c:
+        c = read_data(case, SCRAPED_DIR)
+        if c and is_valid(c):
             logger.info(f'read {case} successfully')
             p = parse(c)
             if p:
                 logger.info(f'parsed {case} successfully')
-                save_data(p, case, PARSED_DIR)
-                logger.info(f'saved {case} to {PARSED_DIR}')
-
-
-        # index += 1
-        # message = f"Starting to parse file {index} of {len(list_of_files)}... "
-        # logger.info(message) if logger is not None else print(message, end='')
-        # doc = read_data('', fileName)  # fileName include path and os.sep not needed
-        # if len(doc) < 1:  # private case - we got empty file
-        #     message = "Skipped because len"
-        #     logger.info(message) if logger is not None else print(message)
-        #     skip_counter += 1
-        #     move_file(doc, fileName, folder, unhandledFolder)
-        #     continue
-        # elif 'פני:' not in str(doc['Doc Details']):  # old type of case
-        #     message = "Skipped because missing key"
-        #     logger.info(message) if logger is not None else print(message)
-        #     skip_counter += 1
-        #     move_file(doc, fileName, folder, unhandledFolder)
-        #     continue
-        # doc['Doc Details'], succeed = parser(doc['Doc Details'])  # if succeed Dict, else text
-        # write_folder = handledFolder if succeed else unhandledFolder
-        #
-        # if succeed:
-        #     insert info data into doc details and remove old duplicate
-            # for key in doc['Doc Info']:
-            #     doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
-            #         else [int(s) for s in doc['Doc Info'][key].split() if s.isdigit()][0]
-            # doc.pop('Doc Info', None)
-            # counter += 1
-            # logger.info(f"File {index} succeed") if logger is not None else print('Succeed')
-        # else:
-        #     logger.info(f"File {index} failed") if logger is not None else print('Failed')
-        # move_file(doc, fileName, folder, write_folder)
-
+                save_data(p, case, SUCCESS_DIR)
+                logger.info(f'saved {case} to {SUCCESS_DIR}')
+            else:
+                logger.info(f'failed to parse {case}')
+                save_data(c, case, FAILED_PARSE_DIR)
+        else:
+            logger.info(f'failed to read {case}: case not valid')
+            save_data(c, case, FAILED_VALIDATION_DIR)
+    # TODO remove file from scraped?
     logger.info(f'finished parsing {len(cases)} cases')
+
+
+def get_names(files):
+    names = []
+    for file in files:
+        s = file.split("/")
+        n = s[len(s)-1]
+        names.append(n)
+    return names
+
+
+def get_cases(path_):
+    files = get_all_files(path_)
+    return get_names(files)
 
 
 def main():
     logger = Logger('parser.log', get_path(n=0) + f'logs/').get_logger()
     logger.info("parser is starting")
-    create_dir(PARSED_DIR)
+    create_dir(SUCCESS_DIR)
+    create_dir(FAILED_VALIDATION_DIR)
+    create_dir(FAILED_PARSE_DIR)
     while True:
-        cases = get_all_files(SCRAPED_DIR)
+        cases = get_cases(SCRAPED_DIR)
         run_v2(logger, cases)
-
-    # run(unhandledFolder, logger, min_delay=0)
-    # while True:
-    #     logger.info("parser is starting")
-        # run(readFolder, logger)
 
 
 if __name__ == '__main__':
