@@ -3,7 +3,9 @@ from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
 from hcva.utils.path import get_path, create_dir, remove, get_all_files
 
+DB_NAME = 'hcva'
 ROOT_DIR = path.abspath(curdir)
+LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
 SCRAPED_DIR = ROOT_DIR + "/cases/scraped/"
 SUCCESS_DIR = ROOT_DIR + "/cases/parsed/success/"
 FAILED_VALIDATION_DIR = ROOT_DIR + "/cases/parsed/failed_validation/"
@@ -300,7 +302,7 @@ def get_cases(path_):
 
 
 def main():
-    logger = Logger('parser.log', get_path(n=0) + f'logs/').get_logger()
+    logger = Logger('parser.log', LOG_DIR).get_logger()
     logger.info("parser is starting")
     create_dir(SUCCESS_DIR)
     create_dir(FAILED_VALIDATION_DIR)
