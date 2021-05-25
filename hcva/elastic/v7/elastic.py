@@ -15,17 +15,17 @@ ROOT_DIR = os.path.abspath(os.curdir)
 LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
 PARSED_DIR = ROOT_DIR + "/cases/parsed/success/"
 SUCCESS_DIR = "success_upload/"
-FAILED_VALIDATION_DIR = "failed_validation"
-FAILED_UPLOAD_DIR = "failed_upload"
+FAILED_VALIDATION_DIR = "failed_validation/"
+FAILED_UPLOAD_DIR = "failed_upload/"
 
 
 def get_source(file_name):
-    source = ROOT_DIR + PARSED_DIR + file_name
+    source = PARSED_DIR + file_name
     return source
 
 
 def get_destination(directory):
-    destination = ROOT_DIR + "/cases/elastic" + directory
+    destination = ROOT_DIR + "/cases/elastic/" + directory
     os.makedirs(destination, exist_ok=True)
     return destination
 
@@ -61,7 +61,7 @@ class Elastic:
                 self._logger.error("Error creating index")
 
     def run(self):
-        products = get_all_files(folder_name=ROOT_DIR + PARSED_DIR)
+        products = get_all_files(folder_name=PARSED_DIR)
         self._logger.info(f'trying to upload {len(products)} cases')
         self.index_with_schema(products)
 
