@@ -2,7 +2,7 @@ from hcva.utils.database import Database
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, sep, get_files, create_dir, change_dir
+from hcva.utils.path import get_path, sep, get_files, change_dir
 
 
 handledFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
