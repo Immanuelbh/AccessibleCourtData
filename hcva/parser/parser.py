@@ -1,4 +1,4 @@
-from hcva.constants import constants
+from hcva.utils import constants
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
 from hcva.utils.path import create_dir, remove, get_all_files

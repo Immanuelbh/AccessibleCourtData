@@ -1,14 +1,8 @@
-from hcva.constants import constants
+from hcva.utils import constants
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from hcva.utils.date import init_dates
 from hcva.utils.logger import Logger
-
-DB_NAME = constants.DB_NAME
-DB_URI = constants.DB_URI
-# DB_URI = os.environ.get('MONGO_DB_URI')
-ROOT_DIR = constants.ROOT_DIR
-log_path = constants.LOG_DIR
 
 
 def create_docs():
@@ -25,11 +19,11 @@ def create_docs():
 
 
 class Database:
-    logger = Logger('db.log', log_path).get_logger()
+    logger = Logger('db.log', constants.LOG_DIR).get_logger()
     collection = None
 
     def __init__(self):
-        self.client = MongoClient(DB_URI)
+        self.client = MongoClient(constants.DB_URI)
         self.get_connection()
 
     def get_connection(self):

@@ -2,7 +2,7 @@ import os
 
 # database
 DB_NAME = 'hcva'
-DB_URI = f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
+DB_URI = os.environ.get('MONGO_DB_URI') or f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
 
 # elastic
 ELASTIC_INDEX = 'test_index_1'

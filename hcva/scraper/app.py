@@ -1,6 +1,6 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from hcva.constants import constants
+from hcva.utils import constants
 from hcva.utils.json import save_data
 from hcva.scraper import scraper
 from hcva.utils.database import Database

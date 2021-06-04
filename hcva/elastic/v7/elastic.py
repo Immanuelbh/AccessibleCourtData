@@ -1,5 +1,5 @@
 from hcva.elastic.validation.json_validator import *
-from hcva.constants import constants
+from hcva.utils import constants
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep

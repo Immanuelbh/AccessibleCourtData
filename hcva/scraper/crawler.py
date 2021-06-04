@@ -1,13 +1,13 @@
 import threading
 from platform import system
-from hcva.constants import constants
+from hcva.utils import constants
 from hcva.utils.logger import Logger
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementClickInterceptedException, \
     ElementNotVisibleException, ElementNotSelectableException, ElementNotInteractableException, NoAlertPresentException, \
-    JavascriptException, WebDriverException
+    JavascriptException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
