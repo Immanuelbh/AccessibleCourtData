@@ -34,7 +34,6 @@ def get_num_cases(crawler):
     print('could not get this page amount of cases')
     return 0
 
-# TODO change to switch
 def get_string_by_index(xpath, index):
     if xpath == 'שם':
         return f'/html/body/div[2]/div/form/div/div/div[1]/div[3]/ul/li[{index}]/div[2]/a'
@@ -110,7 +109,6 @@ def is_blocked_case(crawler):
         result = True
     return result
 
-# TODO change to switch
 def get_titles(index):
     if index == 1:
         return [['מספר הליך', 'מדור', 'תאריך הגשה', 'סטטוס תיק'], ['מערער', 'משיב', 'אירוע אחרון']]
