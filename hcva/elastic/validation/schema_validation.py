@@ -10,7 +10,7 @@ SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/json_schema/json_schema.
 DEFAULT_SCHEMA = get_path('json_schema/json_schema.json')
 
 
-def validate_v1(data_file, schema_file=SCHEMA):
+def validate_schema(data_file, schema_file=SCHEMA):
     try:
         with open(data_file, encoding='utf-8') as data_to_elastic:
             elastic_data = json.load(data_to_elastic)

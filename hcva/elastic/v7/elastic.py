@@ -1,4 +1,4 @@
-from hcva.elastic.validation.json_validator import *
+from hcva.elastic.validation.schema_validation import *
 from hcva.utils import constants
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
@@ -76,7 +76,7 @@ class Elastic:
         for product in products:
             file_name = os.path.basename(product)
             self._logger.info("trying to validate {}".format(file_name))
-            if validate_v1(data_file=product):
+            if validate_schema(data_file=product):
                 self._logger.info("file is valid")
                 id_, data = self.extract_data(product)
                 res = self.upload(id_, data)
