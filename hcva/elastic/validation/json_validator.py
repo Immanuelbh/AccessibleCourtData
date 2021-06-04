@@ -1,13 +1,12 @@
-from os import path, curdir
 import sys
 import jsonschema
 import json
+from hcva.constants import constants
 from hcva.elastic.v5.relative_path import get_path
 
 sys.path.insert(1, '../../..')
 
-ROOT_DIR = path.abspath(curdir)
-SCHEMA = ROOT_DIR + '/hcva/elastic/validation/json_schema/json_schema.json'
+SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/json_schema/json_schema.json'
 DEFAULT_SCHEMA = get_path('json_schema/json_schema.json')
 
 

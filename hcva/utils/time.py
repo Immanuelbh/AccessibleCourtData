@@ -1,8 +1,4 @@
-from time import sleep, strftime, localtime
-
-
-def curr_time(num_sep='-', date_time_sep='_'):
-    return strftime(f"%d{num_sep}%m{num_sep}%Y{date_time_sep}%H{num_sep}%M{num_sep}%S", localtime())
+from time import sleep
 
 
 def call_sleep(logger=None, days=0, hours=0, minutes=0, seconds=0):

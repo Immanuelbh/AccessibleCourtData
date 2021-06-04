@@ -1,47 +1,19 @@
 from hcva.elastic.validation.json_validator import *
+from hcva.constants import constants
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
-from hcva.utils.path import get_all_files
+from hcva.utils.path import get_all_files, create_dir
 from elasticsearch import Elasticsearch
 import os
-import shutil
 import sys
 sys.path.insert(1, '../../..')
 
-DB_NAME = 'hcva'
-ELASTIC_INDEX = 'test_index_1'
-ROOT_DIR = os.path.abspath(os.curdir)
-LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
-PARSED_DIR = ROOT_DIR + "/cases/parsed/success/"
-SUCCESS_DIR = "success_upload/"
-FAILED_VALIDATION_DIR = "failed_validation/"
-FAILED_UPLOAD_DIR = "failed_upload/"
-
-
-def get_source(file_name):
-    source = PARSED_DIR + file_name
-    return source
-
-
-def get_destination(directory):
-    destination = ROOT_DIR + "/cases/elastic/" + directory
-    os.makedirs(destination, exist_ok=True)
-    return destination
-
-
-def flush(files, directory):
-    destination = get_destination(directory)
-    for file in files:
-        source = get_source(file)
-        shutil.move(source, destination)
-
 
 def save(files, directory):
-    destination = get_destination(directory)
     for file in files:
-        d = read_data(file, PARSED_DIR)
-        save_data(d, file, destination)
+        d = read_data(file, constants.PARSED_SUCCESS_DIR)
+        save_data(d, file, directory)
 
 
 def build_elasticsearch_id(json_id):
@@ -71,37 +43,33 @@ class Elastic:
     def __init__(self, logger):
         self._logger = logger
         self.elastic = Elasticsearch()
+        create_dir(constants.ELASTIC_SUCCESS_DIR)
+        create_dir(constants.ELASTIC_FAILED_UPLOAD_DIR)
+        create_dir(constants.ELASTIC_FAILED_VALIDATION_DIR)
 
     def init_index(self):
-        self._logger.info("initializing elasticsearch index :: {}".format(ELASTIC_INDEX))
-        if self.elastic.indices.exists(index=ELASTIC_INDEX):
-            self._logger.info("{} index exists".format(ELASTIC_INDEX))
+        self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX}")
+        if self.elastic.indices.exists(index=constants.ELASTIC_INDEX):
+            self._logger.info(f"{constants.ELASTIC_INDEX} index exists")
             return True
         else:
-            self._logger.info("creating index :: {} ".format(ELASTIC_INDEX))
-            response = self.elastic.indices.create(index=ELASTIC_INDEX)
+            self._logger.info(f"creating index :: {constants.ELASTIC_INDEX} ")
+            response = self.elastic.indices.create(index=constants.ELASTIC_INDEX)
             if response:
                 return response['acknowledged']
             else:
                 self._logger.error("Error creating index")
 
     def run(self):
-        products = get_all_files(folder_name=PARSED_DIR)
+        products = get_all_files(folder_name=constants.PARSED_SUCCESS_DIR)
         self._logger.info(f'trying to upload {len(products)} cases')
         self.index_with_schema(products)
 
-    def flush_all(self):
-        self._logger.info("flushing folder")
-        flush(self.success_upload, SUCCESS_DIR)
-        flush(self.failed_upload, FAILED_UPLOAD_DIR)
-        flush(self.failed_validation, FAILED_VALIDATION_DIR)
-        self._logger.info("all files flushed")
-
     def save_all(self):
         self._logger.info("saving results")
-        save(self.success_upload, SUCCESS_DIR)
-        save(self.failed_upload, FAILED_UPLOAD_DIR)
-        save(self.failed_validation, FAILED_VALIDATION_DIR)
+        save(self.success_upload, constants.ELASTIC_SUCCESS_DIR)
+        save(self.failed_upload, constants.ELASTIC_FAILED_UPLOAD_DIR)
+        save(self.failed_validation, constants.ELASTIC_FAILED_VALIDATION_DIR)
         self._logger.info("all files saved")
 
     def index_with_schema(self, products):
@@ -138,21 +106,20 @@ class Elastic:
 
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=ELASTIC_INDEX, id=id_, body=data)
+        res = self.elastic.index(index=constants.ELASTIC_INDEX, id=id_, body=data)
         self._logger.info(f"file {res['result']}")
         return res
 
 
 def main():
-    logger = Logger('elasticsearch.log', LOG_DIR).get_logger()
+    logger = Logger('elasticsearch.log', constants.LOG_DIR).get_logger()
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
-        logger.info(f"{ELASTIC_INDEX} index created successfully")
+        logger.info(f"{constants.ELASTIC_INDEX} index created successfully")
         while True:
             elastic.run()
             elastic.save_all()
-            # elastic.flush_all()
             call_sleep(logger=logger, minutes=10)
 
 

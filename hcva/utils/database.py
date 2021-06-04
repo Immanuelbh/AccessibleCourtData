@@ -1,15 +1,14 @@
-from os import path, curdir
+from hcva.constants import constants
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-
 from hcva.utils.date import init_dates
 from hcva.utils.logger import Logger
 
-DB_NAME = 'hcva'
-DB_URI = f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
+DB_NAME = constants.DB_NAME
+DB_URI = constants.DB_URI
 # DB_URI = os.environ.get('MONGO_DB_URI')
-ROOT_DIR = path.abspath(curdir)
-log_path = ROOT_DIR + f'/logs/{DB_NAME}/'
+ROOT_DIR = constants.ROOT_DIR
+log_path = constants.LOG_DIR
 
 
 def create_docs():

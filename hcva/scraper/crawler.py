@@ -1,6 +1,6 @@
-import os
 import threading
 from platform import system
+from hcva.constants import constants
 from hcva.utils.logger import Logger
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -12,8 +12,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-ROOT_DIR = os.path.abspath(os.curdir)
-log_path = ROOT_DIR + '/logs/hcva/'
 
 
 class Crawler:
@@ -24,7 +22,7 @@ class Crawler:
     _logger = None  # logging log class
 
     def __init__(self, url):
-        self._logger = Logger(f'crawler_{threading.current_thread().name}.log', log_path).get_logger()
+        self._logger = Logger(f'crawler_{threading.current_thread().name}.log', constants.LOG_DIR).get_logger()
         self._driver = self.get_browser()
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
         self.update_page(url)  # open url
@@ -39,7 +37,7 @@ class Crawler:
             return webdriver.Firefox(GeckoDriverManager().install())
         elif browser == 'edge':
             if system() == 'Windows':
-                return webdriver.Edge(executable_path=ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
+                return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
 
     # input - update as boolean
     # output - return string if true, else None

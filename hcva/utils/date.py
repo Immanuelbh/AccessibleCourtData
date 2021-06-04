@@ -1,6 +1,5 @@
-from datetime import timedelta, date, datetime
-
 import pandas as pd
+from datetime import timedelta, date, datetime
 
 SATURDAY = 6  # according to weekdays by datetime (monday=0, ...)
 

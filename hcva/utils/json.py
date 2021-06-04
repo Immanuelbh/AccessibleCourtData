@@ -5,7 +5,7 @@ from hcva.utils.path import get_path
 
 def save_data(data, file_name=None, file_path=None):
     with open(file_path + file_name, 'w') as outfile:
-        json.dump(data, outfile, indent=4, ensure_ascii=True)
+        json.dump(data, outfile, indent=4, ensure_ascii=False)
 
 
 def read_data(file_name, file_path=None):
