@@ -1,16 +1,8 @@
-from os import path, curdir
+from hcva.utils import constants
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
 from hcva.utils.path import create_dir, remove, get_all_files
 from hcva.utils.time import call_sleep
-
-DB_NAME = 'hcva'
-ROOT_DIR = path.abspath(curdir)
-LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
-SCRAPED_DIR = ROOT_DIR + "/cases/scraped/"
-SUCCESS_DIR = ROOT_DIR + "/cases/parsed/success/"
-FAILED_VALIDATION_DIR = ROOT_DIR + "/cases/parsed/failed_validation/"
-FAILED_PARSE_DIR = ROOT_DIR + "/cases/parsed/failed_parse/"
 
 
 def clean_spaces(text):
@@ -270,20 +262,20 @@ def run(logger, cases):
     logger.info(f'parsing {len(cases)} cases')
     for case in cases:
         logger.info(f'trying to parse {case}...')
-        c = read_data(case, SCRAPED_DIR)
+        c = read_data(case, constants.SCRAPED_DIR)
         if c and is_valid(c):
             logger.info(f'read {case} successfully')
             p = parse(c)
             if p:
                 logger.info(f'parsed {case} successfully')
-                save_data(p, case, SUCCESS_DIR)
-                logger.info(f'saved {case} to {SUCCESS_DIR}')
+                save_data(p, case, constants.PARSED_SUCCESS_DIR)
+                logger.info(f'saved {case} to {constants.PARSED_SUCCESS_DIR}')
             else:
                 logger.info(f'failed to parse {case}')
-                save_data(c, case, FAILED_PARSE_DIR)
+                save_data(c, case, constants.PARSED_FAILED_DIR)
         else:
             logger.info(f'failed to read {case}: case not valid')
-            save_data(c, case, FAILED_VALIDATION_DIR)
+            save_data(c, case, constants.PARSED_FAILED_VALIDATION_DIR)
     # TODO remove file from scraped?
     logger.info(f'finished parsing {len(cases)} cases')
 
@@ -303,13 +295,13 @@ def get_cases(path_):
 
 
 def main():
-    logger = Logger('parser.log', LOG_DIR).get_logger()
+    logger = Logger('parser.log', constants.LOG_DIR).get_logger()
     logger.info("parser is starting")
-    create_dir(SUCCESS_DIR)
-    create_dir(FAILED_VALIDATION_DIR)
-    create_dir(FAILED_PARSE_DIR)
+    create_dir(constants.PARSED_SUCCESS_DIR)
+    create_dir(constants.PARSED_FAILED_DIR)
+    create_dir(constants.PARSED_FAILED_VALIDATION_DIR)
     while True:
-        cases = get_cases(SCRAPED_DIR)
+        cases = get_cases(constants.SCRAPED_DIR)
         run(logger, cases)
         call_sleep(logger=logger, minutes=10)
 
