@@ -6,15 +6,15 @@ from hcva.elastic.v5.relative_path import get_path
 
 sys.path.insert(1, '../../..')
 
-SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/json_schema/json_schema.json'
-DEFAULT_SCHEMA = get_path('json_schema/json_schema.json')
+SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/schema/schema_v5.json'
+DEFAULT_SCHEMA = get_path('schema/schema_v5.json')
 
 
-def validate_schema(data_file, schema_file=SCHEMA):
+def validate_schema(data_file):
     try:
         with open(data_file, encoding='utf-8') as data_to_elastic:
             elastic_data = json.load(data_to_elastic)
-        with open(schema_file, encoding='utf-8') as json_schema:
+        with open(SCHEMA, encoding='utf-8') as json_schema:
             schema = json.load(json_schema)
         if jsonschema.validate(elastic_data, schema) is None:
             return True
