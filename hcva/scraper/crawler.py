@@ -1,7 +1,6 @@
 import threading
 from platform import system
 from selenium import webdriver
-from hcva.utils.logger import Logger
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementClickInterceptedException, \
@@ -12,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from hcva.utils import constants
+from hcva.utils.logger import Logger
 
 
 class Crawler:
