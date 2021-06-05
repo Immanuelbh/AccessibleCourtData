@@ -123,8 +123,8 @@ def get_key(temp_key):
         if temp_key in item:
             return key
     for key, item in temp_dict.items():
-        for possibleKey in item:
-            if possibleKey in temp_key:
+        for possible_key in item:
+            if possible_key in temp_key:
                 return key
 
     return None  # if it get here we missing some keys or No key in given tempKey
@@ -164,7 +164,7 @@ def i_got_it_all(temp_dict, key_list):
 
 def parser(case_text):
     doc_dict = dict()
-    add_token, more_info_token, temp_key, values_list, num_of_values, lines_to_skip = False, False, None, None, 1, []
+    add_token, temp_key, values_list, num_of_values, lines_to_skip = False, None, None, 1, []
     case_text = drop_extra_info(case_text)
     verdict_lines = case_text.splitlines()
     doc_dict['מספר הליך'] = verdict_lines[0]
@@ -256,7 +256,7 @@ def is_valid(case):
 
 def run(logger, cases):
     if not cases:
-        logger.info(f'no cases to parse')
+        logger.info('no cases to parse')
         return
 
     logger.info(f'parsing {len(cases)} cases')
