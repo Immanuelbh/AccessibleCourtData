@@ -133,7 +133,8 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        missing-docstring
+        missing-docstring,
+        logging-fstring-interpolation
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -183,7 +184,7 @@ never-returning-functions=sys.exit,argparse.parse_error
 
 # The type of string formatting that logging methods do. `old` means using %
 # formatting, `new` is for `{}` formatting.
-logging-format-style=fstr
+logging-format-style=old
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.
@@ -564,7 +565,7 @@ valid-metaclass-classmethod-first-arg=cls
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=5
+max-args=7
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=7

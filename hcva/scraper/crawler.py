@@ -1,8 +1,7 @@
 import threading
 from platform import system
-from hcva.utils import constants
-from hcva.utils.logger import Logger
 from selenium import webdriver
+from hcva.utils.logger import Logger
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementClickInterceptedException, \
@@ -12,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from hcva.utils import constants
 
 
 class Crawler:
@@ -45,8 +45,7 @@ class Crawler:
     def get_text_query(self, update=True):
         if update:
             return self._text_query
-        else:
-            return None
+        return None
 
     # input - url as string
     # output - return true if succeed else false
@@ -56,13 +55,10 @@ class Crawler:
         if url is not None:
             if type(url) is str:
                 self._driver.get(url)
-                if True:  # TODO check if page loaded aka code 200
-                    self._url = url
-                    message = f'URL change to: {url}'
-                    result = True
-                # else:
-                    # self._driver.back()
-                    # massage = f'Could not load: {url}'
+                # TODO check if page loaded aka code 200
+                self._url = url
+                message = f'URL change to: {url}'
+                result = True
             else:
                 message = 'URL input was not string'
         else:
@@ -126,13 +122,13 @@ class Crawler:
 
     # input - elem_type as string, string as string
     # output - return element if found in <delay> seconds, None otherwise
-    def find_elem(self, elem_type, string, singleElement=True, driver=None, delay=2, raise_error=True):
+    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=2, raise_error=True):
         driver = self._driver if driver is None else driver
         message = ''
         try:
             elem = None
             message = f'found elem: {string}, type: {elem_type}'
-            if singleElement:
+            if single_element:
                 if elem_type == 'xpath':
                     WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, string)))
                     elem = driver.find_element_by_xpath(string)
@@ -271,10 +267,10 @@ class Crawler:
     # input - elem as web element, data as string
     # output - return True if successful, otherwise False
     # do - send the text box elem string
-    def send_data_to_elem(self, elem, data, toClear=True):
+    def send_data_to_elem(self, elem, data, to_clear=True):
         try:
             message = ''
-            if toClear:
+            if to_clear:
                 elem.clear()  # clear text box
                 message = 'text box got cleared'
             elem.send_keys(data)  # type sting into text box
@@ -311,8 +307,7 @@ class Crawler:
         if elem is not None:
             elem.location_once_scrolled_into_view  # don't put ()
             return True
-        else:
-            return False
+        return False
 
     # input - driver as web driver, elem as web element, string as string
     # output - return True if successful, False as stop flag, massage as string
