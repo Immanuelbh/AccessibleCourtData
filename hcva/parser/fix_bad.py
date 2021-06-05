@@ -1,5 +1,5 @@
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import get_path, sep, get_files, remove
+from hcva.utils.path import get_path, sep, get_all_files, remove
 
 readFolder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
 writeFolder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
@@ -20,7 +20,7 @@ def move_file(data, file_name, source_folder, dest_folder):
 
 
 def run():
-    list_of_files = get_files(folder_path=readFolder)
+    list_of_files = get_all_files(folder_path=readFolder)
     for fileName in list_of_files:
         doc = read_data('', fileName)  # fileName include path and os.sep not needed
         if 'לפני' in doc['Doc Details'].keys():

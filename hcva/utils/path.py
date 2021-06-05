@@ -14,22 +14,16 @@ def get_path(old_path=None, n=0, end_sep=True):
     return new_path + sep if end_sep else new_path  # path + sep if true else path
 
 
-# do - get all files of that type at this path
-def get_files(folder_path, file_type='json'):
-    return [f for f in glob(folder_path + "*." + file_type)]
-
-
 def get_all_files(folder_name):
     return [f for f in glob(folder_name + "/*.json")]
 
 
 # input - if dirName is string create folder at current path else create all the path
-def create_dir(dir_name, logger=None):
+def create_dir(dir_name):
     try:
         if not path.exists(dir_name):  # Create target Directory if don't exist
             mkdir(dir_name)
-            message = f"Creating dir with the name: {dir_name}"
-            logger.info(message) if logger is not None else print(message)
+            # logger.info(f"Creating dir with the name: {dir_name}")
     except FileNotFoundError as _:
         n = 1 if system() == 'Windows' else 2  # in case system is not windows - splitPath will have sep at the end
         create_dir(get_path(dir_name, n=n))  # create parent target folder
@@ -37,19 +31,19 @@ def create_dir(dir_name, logger=None):
 
 
 # move file\folder from oldPath to newPath, fileName can be inside oldPath
-def change_dir(source_path, destination_path, file_name=None, delete_source_if_destination_file_exist=False, delete_destination_if_destination_file_exist=False):
+def change_dir(src, dest, file_name=None, delete_src_if_dest_exist=False, delete_dest_if_dest_exist=False):
     try:
-        move(source_path, destination_path) if file_name is None else move(source_path + file_name, destination_path)
+        move(src, dest) if file_name is None else move(src + file_name, dest)
     except fileExistError as _:  # handle a duplicate file
         print("file already exist in new path - ", end='')
-        if delete_source_if_destination_file_exist:
-            remove(source_path) if file_name is None else remove(source_path + file_name)
+        if delete_src_if_dest_exist:
+            remove(src) if file_name is None else remove(src + file_name)
             print("file deleted in source path")
-        elif delete_destination_if_destination_file_exist:
+        elif delete_dest_if_dest_exist:
             n = 1 if system() == 'Windows' else 2
-            file_path = destination_path + file_name if file_name is not None else destination_path + source_path.split(sep)[-n]
+            file_path = dest + file_name if file_name is not None else dest + src.split(sep)[-n]
             remove(file_path)
             print("file deleted in destination path")
-            change_dir(source_path, destination_path, file_name, delete_source_if_destination_file_exist, False)
+            change_dir(src, dest, file_name, delete_src_if_dest_exist, False)
         else:
             print("no delete permission was given")
