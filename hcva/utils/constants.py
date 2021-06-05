@@ -5,7 +5,7 @@ DB_NAME = 'hcva'
 DB_URI = os.environ.get('MONGO_DB_URI') or f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
 
 # elastic
-ELASTIC_INDEX = 'test_index_1'
+ELASTIC_INDEX_NAME = 'test_index_2'
 
 # mongo
 COLLECTION_NAME = 'v3'
@@ -24,3 +24,4 @@ PARSED_FAILED_VALIDATION_DIR = OUTPUT_DIR + 'parsed/failed_validation/'
 ELASTIC_SUCCESS_DIR = OUTPUT_DIR + 'elastic/success_upload/'
 ELASTIC_FAILED_VALIDATION_DIR = OUTPUT_DIR + 'elastic/failed_validation/'
 ELASTIC_FAILED_UPLOAD_DIR = OUTPUT_DIR + 'elastic/failed_upload/'
+ELASTIC_INDEX_PATH = ROOT_DIR + '/hcva/elastic/index/index_v7.json'

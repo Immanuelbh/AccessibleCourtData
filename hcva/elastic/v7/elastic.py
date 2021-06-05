@@ -30,8 +30,7 @@ def build_an_initial_id(json_id):
 
 def build_first_continuous_number(initial_id):
     first_continuous_number = 1  # Set an initial runner number to a procedure number
-    elasticsearch_id = f"{initial_id}-{first_continuous_number}"
-    return elasticsearch_id
+    return f"{initial_id}-{first_continuous_number}"
 
 
 class Elastic:
@@ -48,17 +47,21 @@ class Elastic:
         create_dir(constants.ELASTIC_FAILED_VALIDATION_DIR)
 
     def init_index(self):
-        self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX}")
-        if self.elastic.indices.exists(index=constants.ELASTIC_INDEX):
-            self._logger.info(f"{constants.ELASTIC_INDEX} index exists")
-            return True
-        else:
-            self._logger.info(f"creating index :: {constants.ELASTIC_INDEX} ")
-            response = self.elastic.indices.create(index=constants.ELASTIC_INDEX)
-            if response:
-                return response['acknowledged']
-            else:
-                self._logger.error("Error creating index")
+        self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX_NAME}")
+        index = read_data('', constants.ELASTIC_INDEX_PATH)
+        response = self.elastic.indices.create(
+            index=constants.ELASTIC_INDEX_NAME,
+            body=index,
+            ignore=400
+        )
+        if 'acknowledged' in response:
+            if response['acknowledged']:
+                self._logger.info(f'index created: {response["index"]}')
+                return True
+        elif 'error' in response:
+            self._logger.error("ERROR:", response['error']['root_cause'])
+            self._logger.error("TYPE:", response['error']['type'])
+        return False
 
     def run(self):
         cases = get_all_files(folder_name=constants.PARSED_SUCCESS_DIR)
@@ -106,7 +109,7 @@ class Elastic:
 
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=constants.ELASTIC_INDEX, id=id_, body=data)
+        res = self.elastic.index(index=constants.ELASTIC_INDEX_NAME, id=id_, body=data)
         self._logger.info(f"file {res['result']}")
         return res
 
@@ -116,7 +119,7 @@ def main():
     elastic = Elastic(logger)
     index_created = elastic.init_index()
     if index_created:
-        logger.info(f"{constants.ELASTIC_INDEX} index created successfully")
+        logger.info(f"{constants.ELASTIC_INDEX_NAME} index created successfully")
         while True:
             elastic.run()
             elastic.save_all()
