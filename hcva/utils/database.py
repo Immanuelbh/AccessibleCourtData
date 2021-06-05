@@ -1,8 +1,8 @@
-from hcva.utils import constants
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from hcva.utils.date import init_dates
 from hcva.utils.logger import Logger
+from hcva.utils import constants
 
 
 def create_docs():
