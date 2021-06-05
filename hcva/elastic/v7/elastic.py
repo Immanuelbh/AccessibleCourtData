@@ -1,19 +1,21 @@
-from hcva.elastic.validation.schema_validation import *
+import os
+import sys
+import json
+from elasticsearch import Elasticsearch
+from hcva.elastic.validation.schema_validation import validate_schema
 from hcva.utils import constants
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.path import get_all_files, create_dir
-from elasticsearch import Elasticsearch
-import os
-import sys
+
 sys.path.insert(1, '../../..')
 
 
 def save(files, directory):
     for file in files:
-        d = read_data(file, constants.PARSED_SUCCESS_DIR)
-        save_data(d, file, directory)
+        data = read_data(file, constants.PARSED_SUCCESS_DIR)
+        save_data(data, file, directory)
 
 
 def build_elasticsearch_id(json_id):

@@ -22,16 +22,16 @@ class App:
         with ThreadPoolExecutor(max_workers=self.threads) as executor:
             executor.map(self.scrape, dates)
 
-    def scrape(self, d):
+    def scrape(self, date):
         self.logger.info(f'starting thread #{threading.current_thread().name}')
-        d = d['date']
-        cases = scraper.get(d)
+        date = date['date']
+        cases = scraper.get(date)
         for i, case in enumerate(cases, start=1):
-            name = f'{d}__{i}.json'
+            name = f'{date}__{i}.json'
             save_data(case, name, constants.SCRAPED_DIR)
             self.logger.info(f'saved {name}')
 
-        self.db.update_status(d, 'done')  # TODO add empty/not empty
+        self.db.update_status(date, 'done')  # TODO add empty/not empty
         self.logger.info(f'thread #{threading.current_thread().name} finished')
 
 

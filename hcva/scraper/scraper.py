@@ -13,9 +13,9 @@ def get_frame(crawler, elem_type, string):
     frame = crawler.find_elem(elem_type, string)
     if frame is not None:
         return crawler.switch_frame(frame)
-    else:
-        print(f'could not switch to frame: {string}')
-        return False
+
+    print(f'could not switch to frame: {string}')
+    return False
 
 
 def get_num_cases(crawler):
@@ -28,9 +28,9 @@ def get_num_cases(crawler):
             update = crawler.read_elem_text(elem)
             text = crawler.get_text_query(update)
             if text is not None and len(text) > 0:
-                n = [int(s) for s in text.split() if s.isdigit()][0]
-                print('this page got {} cases'.format(n))
-                return n
+                count_cases = [int(s) for s in text.split() if s.isdigit()][0]
+                print(f'this page got {count_cases} cases')
+                return count_cases
     print('could not get this page amount of cases')
     return 0
 
@@ -58,10 +58,10 @@ def get_elem(crawler, xpath, index):
     return crawler.find_elem('xpath', string, raise_error=False)
 
 
-def scroll_into_view(crawler, n):
+def scroll_into_view(crawler, num):
     result = True
-    if n > 90:
-        for index in range(84, n - 5):
+    if num > 90:
+        for index in range(84, num - 5):
             elem = get_elem(crawler, 'שם', index)
             result = crawler.scroll_to_elem(elem)
         if result:
@@ -142,16 +142,16 @@ def get_other_case_details(crawler, index):
     m_list = list()
     title = get_titles(index)
     row = 0
-    keepGoing = True
+    keep_going = True
 
     elem = get_elem(crawler, 'many rows', index)
-    multiRow = crawler.read_elem_text(elem)
+    multi_row = crawler.read_elem_text(elem)
 
-    while keepGoing is True:
+    while keep_going is True:
         row += 1
         m_dict = dict()
         for col in range(len(title)):
-            if multiRow:
+            if multi_row:
                 xpath = '/html/body/div/div[2]/div[' + str(index) + ']/table/tbody/tr[' + str(
                     row) + ']/td[' + str(col + 1) + ']'
             else:
@@ -164,12 +164,12 @@ def get_other_case_details(crawler, index):
             if update:
                 m_dict[title[col]] = text
             else:  # No more info to get here
-                keepGoing = False
+                keep_going = False
                 break
 
-        if keepGoing is True:
+        if keep_going is True:
             m_list.append(m_dict)
-            if multiRow is False:
+            if multi_row is False:
                 break
     return m_list
 
@@ -192,8 +192,7 @@ def get_column_text(crawler, index):
 
     if elem is not None:
         return func(crawler, index)
-    else:
-        return None
+    return None
 
 
 def get_case_inside_details(crawler):
@@ -239,15 +238,15 @@ def get_case_details(crawler, index):
 
 def get(date):
     url = build_url(date)
-    c = Crawler(url=url)  # TODO make sure page is fully loaded
+    crawler = Crawler(url=url)  # TODO make sure page is fully loaded
     time.sleep(5)
-    num_cases = get_num_cases(c)
+    num_cases = get_num_cases(crawler)
     cases = []
     for i in range(num_cases, 0, -1):  # get from last to first
-        case_details = get_case_details(c, i)
+        case_details = get_case_details(crawler, i)
         if case_details is not None:
             cases.append(case_details)
 
-    c.close()
+    crawler.close()
     cases.reverse()
     return cases

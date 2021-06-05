@@ -14,7 +14,7 @@ def read_data(file_name, file_path=None):
         with open(file_path + file_name, encoding='utf8') as json_file:
             data = json.load(json_file)
         return data
-    except JSONDecodeError as e:
+    except JSONDecodeError as err:
         print(f'Error in decoding this file: {file_name}')
-        print(e)
+        print(err)
         return ''
