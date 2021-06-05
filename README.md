@@ -1,55 +1,73 @@
 # Hebrew Court Verdicts Analyzer
 
 # Development
+
 ## Installation
+
 ### Clone project
-```
+```shell
 $ git clone --recurse-submodules https://github.com/Immanuelbh/HebrewCourtVerdictsAnalyzer.git
 $ cd HebrewCourtVerdictsAnalyzer/
 ```
+
 ### Install required modules
+
 #### MacOS
-```
+```shell
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
+
 #### Windows
-```
+```shell
 $ python3 -m venv venv
 $ venv\Scripts\activate.bat
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
+
+### Pylint
+```shell
+$ pylint hcva
+```
+
 ### ELK stack
+
 #### Version
 Configured by changing the branch in the .gitmodules file.
-```
+```shell
 branch = release-5.x
 ```
 Update to different version
 ```
 $ git submodule update --remote
 ```
+
 #### Commands
+
 ##### Initialise
-```
+```shell
 $ cd env/
 $ ./init_env.sh
 ```
 
 ##### Shutdown
-```
+```shell
 $ cd env/
 $ ./shutdown_env.sh
 ```
+
 ### App
+
 #### Commands
+
 ##### Run
-```
+```shell
 $ ./init_app.sh
 ```
+
 ##### Shutdown
-```
+```shell
 $ ./shutdown_app.sh
 ```
 
