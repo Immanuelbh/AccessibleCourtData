@@ -28,7 +28,7 @@ $ venv\Scripts\activate.bat
 
 ### Tests
 ```shell
-$ 
+$ python -m unittest
 ```
 
 ### Pylint
