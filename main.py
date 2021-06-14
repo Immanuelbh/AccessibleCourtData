@@ -13,7 +13,7 @@ if __name__ == '__main__':
         choice = int(sys.argv[1])
     else:
         choice = int(input("Enter which function you want to run:\n"
-                           "1: HCVA\n"
+                           "1: Scraper\n"
                            "2: Parser\n"
                            "3: Elastic\n"
                            ))

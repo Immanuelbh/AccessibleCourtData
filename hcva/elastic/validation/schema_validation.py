@@ -6,7 +6,7 @@ from hcva.elastic.v5.relative_path import get_path
 
 sys.path.insert(1, '../../..')
 
-SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/schema/schema_v5.json'
+SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/schema/schema_v7.json'
 DEFAULT_SCHEMA = get_path('schema/schema_v5.json')
 
 
