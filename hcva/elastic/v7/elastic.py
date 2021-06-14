@@ -39,7 +39,6 @@ class Elastic:
     failed_upload = []
     failed_validation = []
     success_upload = []
-    index_exists = False
 
     def __init__(self, logger):
         self._logger = logger
@@ -61,8 +60,7 @@ class Elastic:
                 self._logger.info(f'index created: {response["index"]}')
                 return True
         elif 'error' in response:
-            self._logger.error("ERROR:", response['error']['root_cause'])
-            self._logger.error("TYPE:", response['error']['type'])
+            self._logger.error(f'ERROR: {response["error"]}')
         return False
 
     def run(self):

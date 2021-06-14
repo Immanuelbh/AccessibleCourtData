@@ -26,6 +26,11 @@ $ venv\Scripts\activate.bat
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
 
+### Tests
+```shell
+$ python -m unittest
+```
+
 ### Pylint
 ```shell
 $ pylint hcva
