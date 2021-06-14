@@ -11,7 +11,7 @@ ELASTIC_INDEX_NAME = 'test_index_2'
 COLLECTION_NAME = 'v3'
 
 # directories #
-ROOT_DIR = os.path.abspath(os.curdir)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOG_DIR = ROOT_DIR + f'/logs/{DB_NAME}/'
 OUTPUT_DIR = ROOT_DIR + '/cases/'
 # scraper
