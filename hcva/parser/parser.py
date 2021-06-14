@@ -1,3 +1,5 @@
+from hcva.parser.fix_bad import fix_bad
+from hcva.parser.new_schema import add_new_schema
 from hcva.utils import constants
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
@@ -254,6 +256,12 @@ def is_valid(case):
     return True
 
 
+def parser_flow(parsed):
+    # p = fix_bad(parsed)
+    p = add_new_schema(parsed)
+    return p
+
+
 def run(logger, cases):
     if not cases:
         logger.info('no cases to parse')
@@ -267,9 +275,12 @@ def run(logger, cases):
             logger.info(f'read {case} successfully')
             p = parse(c)
             if p:
-                logger.info(f'parsed {case} successfully')
-                save_data(p, case, constants.PARSED_SUCCESS_DIR)
-                logger.info(f'saved {case} to {constants.PARSED_SUCCESS_DIR}')
+                logger.info(f'stage 1 - parsed {case} successfully')
+                p = parser_flow(p)
+                if p:
+                    logger.info(f'stage 2 - parsed {case} successfully')
+                    save_data(p, case, constants.PARSED_SUCCESS_DIR)
+                    logger.info(f'saved {case} to {constants.PARSED_SUCCESS_DIR}')
             else:
                 logger.info(f'failed to parse {case}')
                 save_data(c, case, constants.PARSED_FAILED_DIR)

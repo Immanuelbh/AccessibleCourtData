@@ -5,6 +5,11 @@ read_folder = get_path(n=0) + f'products{sep}handled_json_products{sep}'
 write_folder = get_path(n=0) + f'products{sep}unhandled_json_products{sep}'
 
 
+def fix_bad(case):
+    if 'לפני' in case['Doc Details'].keys():
+        return fix_schema(case)
+
+
 def fix_schema(doc):
     for key in doc['Doc Info']:
         doc['Doc Details'][key] = doc['Doc Info'][key] if key != 'עמודים' \
