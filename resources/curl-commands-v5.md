@@ -1,30 +1,3 @@
-# Documentation of the various curl commands
-
-## New
-
----
-## Old
-### -------------------------------- ELK_7.6 --------------------------------
-
-`Curl -X GET “http://localhost:9200/_index/_doc/_id?pretty”`
-
-`Curl -X PUT “http://localhost:9200/_index/_doc/_id?pretty” -d ‘Directory’ -H “Content-Type: application/json”`
-
-`Curl -X POST “http://localhost:9200/_index/_update/_id?pretty” -d ‘Directory’ -H “Content-Type: application/json”`
-
-`Curl -X DELETE “http://localhost:9200/_index”`
-
-`Curl -X GET “http://localhost:9200/_script/*.script”`
-
-`Curl -X DELETE “http://localhost:9200/_script/*.script”`
-
-
-`curl -i -XPOST --user 'elastic:changeme' 'http://localhost:9200/supreme_court_rulings_test/_update/test?pretty' --data-ascii '@19-03-2020_12-50-44.json' -H 'Content-Type:application/json'`
-
-`curl -X DELETE --user 'elastic:changeme' 'http://localhost:9200/supreme_court_rulings_test'`
-
-`curl -X GET --user 'elastic:changeme' 'http://localhost:9200/supreme_court_rulings_test/_doc/בגץ_7715_19@46-39_43'`
-
 ### -------------------------------- ELK_5.5.3 --------------------------------
 
 `curl -i -XPOST --user 'elastic:changeme' 'http://localhost:9200/supreme_court/rulings/test?pretty' --data-ascii '@19-03-2020_12-50-44.json' -H 'Content-Type:application/json'`

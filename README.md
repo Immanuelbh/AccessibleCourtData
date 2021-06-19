@@ -2,7 +2,17 @@
 
 # Development
 
+## Prerequisites
+
+- [Docker](https://www.docker.com/get-started)
+- [Git](https://git-scm.com/downloads)
+
 ## Installation
+Overall flow:
+- Clone project
+- Install modules
+- Initialize environment
+- Run app
 
 ### Clone project
 ```shell
@@ -26,20 +36,17 @@ $ venv\Scripts\activate.bat
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
 
-### Pylint
-```shell
-$ pylint hcva
-```
-
 ### ELK stack
 
 #### Version
+**Default** version is 7.x - there is no need to change the version unless you know what you are doing.
+
 Configured by changing the branch in the .gitmodules file.
 ```shell
 branch = release-5.x
 ```
 Update to different version
-```
+```shell
 $ git submodule update --remote
 ```
 
@@ -70,6 +77,20 @@ $ ./init_app.sh
 ```shell
 $ ./shutdown_app.sh
 ```
+
+### Pylint
+```shell
+$ pylint hcva
+```
+
+### Interaction
+
+To use the stack, you can use the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html) (port 9200) or the DevTools in Kibana.
+
+#### Kibana
+
+- The first time you log in to Kibana you will have to enter an index pattern. This is used by Kibana to determine which indices the search will be run against.
+- More information on using Kibana can be found in the **[resources](/resources)** directory
 
 
 # Thank you
