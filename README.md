@@ -2,6 +2,11 @@
 
 # Development
 
+## Prerequisites
+
+- [Docker](https://www.docker.com/get-started)
+- [Git](https://git-scm.com/downloads)
+
 ## Installation
 
 ### Clone project
@@ -39,7 +44,7 @@ Configured by changing the branch in the .gitmodules file.
 branch = release-5.x
 ```
 Update to different version
-```
+```shell
 $ git submodule update --remote
 ```
 
@@ -70,6 +75,10 @@ $ ./init_app.sh
 ```shell
 $ ./shutdown_app.sh
 ```
+
+### Interaction
+
+To use the stack, you can use the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html) (port 9200) or the DevTools in Kibana.
 
 
 # Thank you
