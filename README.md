@@ -8,6 +8,11 @@
 - [Git](https://git-scm.com/downloads)
 
 ## Installation
+Overall flow:
+- Clone project
+- Install modules
+- Initialize environment
+- Run app
 
 ### Clone project
 ```shell
@@ -31,14 +36,11 @@ $ venv\Scripts\activate.bat
 (venv) $ pip3 install -r requirements/requirements.txt
 ```
 
-### Pylint
-```shell
-$ pylint hcva
-```
-
 ### ELK stack
 
 #### Version
+**Default** version is 7.x - there is no need to change the version unless you know what you are doing.
+
 Configured by changing the branch in the .gitmodules file.
 ```shell
 branch = release-5.x
@@ -74,6 +76,11 @@ $ ./init_app.sh
 ##### Shutdown
 ```shell
 $ ./shutdown_app.sh
+```
+
+### Pylint
+```shell
+$ pylint hcva
 ```
 
 ### Interaction
