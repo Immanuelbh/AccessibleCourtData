@@ -80,6 +80,11 @@ $ ./shutdown_app.sh
 
 To use the stack, you can use the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html) (port 9200) or the DevTools in Kibana.
 
+#### Kibana
+
+- The first time you log in to Kibana you will have to enter an index pattern. This is used by Kibana to determine which indices the search will be run against.
+- More information on using Kibana can be found in the **[resources](/resources)** directory
+
 
 # Thank you
 This project is part of the two-semester project for the [HIT Project Center](http://www.hitprojectscenter.com/), led by [Dr Yonathan Schler](https://www.hit.ac.il/faculty_staff/%D7%99%D7%94%D7%95%D7%A0%D7%AA%D7%9F_%D7%A9%D7%9C%D7%A8).
