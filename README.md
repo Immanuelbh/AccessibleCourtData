@@ -4,6 +4,8 @@
 
 ## Prerequisites
 
+- [Python3](https://www.python.org/downloads/)
+- [Pip3](https://pip.pypa.io/en/stable/installing/)
 - [Docker](https://www.docker.com/get-started)
 - [Git](https://git-scm.com/downloads)
 
