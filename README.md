@@ -7,6 +7,7 @@
 - [Python3](https://www.python.org/downloads/)
 - [Pip3](https://pip.pypa.io/en/stable/installing/)
 - [Docker](https://www.docker.com/get-started)
+- [Docker-compose](https://docs.docker.com/compose/install/)
 - [Git](https://git-scm.com/downloads)
 
 ## Installation
