@@ -2,14 +2,14 @@ import os
 
 # database
 DB_NAME = 'hcva'
-DB_URI = os.environ.get('MONGO_DB_URI') or f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
+DB_URI = os.getenv('MONGO_DB_URI', f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin')
 
 # crawler
-BROWSER_TYPE = os.environ.get('BROWSER_TYPE') or 'chrome'
-NUM_OF_CRAWLERS = os.environ.get('NUM_OF_CRAWLERS') or 2
+BROWSER_TYPE = os.getenv('BROWSER_TYPE', 'chrome')
+NUM_OF_CRAWLERS = os.getenv('NUM_OF_CRAWLERS', 2)
 
 # elastic
-ELASTIC_INDEX_NAME = os.environ.get('ELASTIC_INDEX_NAME') or 'default_index'
+ELASTIC_INDEX_NAME = os.getenv('ELASTIC_INDEX_NAME', 'default_index')
 
 # mongo
 COLLECTION_NAME = 'v3'
