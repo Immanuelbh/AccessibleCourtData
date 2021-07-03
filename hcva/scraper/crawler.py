@@ -30,6 +30,7 @@ class Crawler:
 
     # Functions
     def get_browser(self, browser):
+        self._logger.debug(f'attempting to open browser: {browser}')
         if browser == 'chrome':
             return webdriver.Chrome(ChromeDriverManager().install())
         elif browser == 'firefox':

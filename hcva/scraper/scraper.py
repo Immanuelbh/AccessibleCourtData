@@ -1,6 +1,11 @@
 import time
 from hcva.scraper.crawler import Crawler
+from hcva.utils import constants
 from hcva.utils.time import call_sleep
+from hcva.utils.logger import Logger
+
+logger = Logger('scraper.log', constants.LOG_DIR).get_logger()
+
 
 BASE_URL = 'https://supreme.court.gov.il/Pages/SearchJudgments.aspx?&DateType=2&freeText=null&CaseNumber=null'
 
@@ -237,6 +242,7 @@ def get_case_details(crawler, index):
 
 
 def get(date):
+    logger.info(f'scraping date: {date}')
     url = build_url(date)
     crawler = Crawler(url=url)  # TODO make sure page is fully loaded
     time.sleep(5)
