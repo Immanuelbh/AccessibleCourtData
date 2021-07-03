@@ -32,9 +32,9 @@ class Crawler:
     def get_browser(self, browser):
         self._logger.debug(f'attempting to open browser: {browser}')
         if browser == 'chrome':
-            return webdriver.Chrome(ChromeDriverManager().install())
+            return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
-            return webdriver.Firefox(GeckoDriverManager().install())
+            return webdriver.Firefox(executable_path=GeckoDriverManager().install())
         elif browser == 'edge':
             if system() == 'Windows':
                 return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
