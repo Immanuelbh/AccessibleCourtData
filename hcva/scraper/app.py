@@ -19,9 +19,8 @@ class App:
 
     def run(self):
         dates = self.db.get_dates()
-        self.scrape(dates[0])
-        # with ThreadPoolExecutor(max_workers=self.threads) as executor:
-        #     executor.map(self.scrape, dates)
+        with ThreadPoolExecutor(max_workers=self.threads) as executor:
+            executor.map(self.scrape, dates)
 
     def scrape(self, date):
         self.logger.info(f'starting thread #{threading.current_thread().name}')
