@@ -4,8 +4,12 @@ import os
 DB_NAME = 'hcva'
 DB_URI = os.environ.get('MONGO_DB_URI') or f'mongodb://root:example@localhost:27017/{DB_NAME}?authSource=admin'
 
+# crawler
+BROWSER_TYPE = os.environ.get('BROWSER_TYPE') or 'chrome'
+NUM_OF_CRAWLERS = os.environ.get('NUM_OF_CRAWLERS') or 2
+
 # elastic
-ELASTIC_INDEX_NAME = 'test_index_2'
+ELASTIC_INDEX_NAME = os.environ.get('ELASTIC_INDEX_NAME') or 'default_index'
 
 # mongo
 COLLECTION_NAME = 'v3'

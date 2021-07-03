@@ -23,14 +23,13 @@ class Crawler:
 
     def __init__(self, url):
         self._logger = Logger(f'crawler_{threading.current_thread().name}.log', constants.LOG_DIR).get_logger()
-        self._driver = self.get_browser()
+        self._driver = self.get_browser(constants.BROWSER_TYPE)
         self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
         self.update_page(url)  # open url
         self._logger.info('crawler created')
 
     # Functions
-    @staticmethod
-    def get_browser(browser='chrome'):
+    def get_browser(self, browser):
         if browser == 'chrome':
             return webdriver.Chrome(ChromeDriverManager().install())
         elif browser == 'firefox':
@@ -38,6 +37,8 @@ class Crawler:
         elif browser == 'edge':
             if system() == 'Windows':
                 return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
+        else:
+            self._logger.error(f'browser type is invalid: ${browser}')
 
     # input - update as boolean
     # output - return string if true, else None
