@@ -36,7 +36,7 @@ class App:
 
 
 def main():
-    app = App(threads=constants.NUM_OF_CRAWLERS)
+    app = App(threads=int(constants.NUM_OF_CRAWLERS))
     if app:
         app.run()
 
