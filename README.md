@@ -88,7 +88,7 @@ $ pylint hcva
 
 ### Interaction
 
-To use the stack, you can use the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html) (port 9200) or the DevTools in Kibana.
+To use the stack, you can use the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html) (port 9200) or the DevTools in Kibana (port 5601).
 
 #### Kibana
 
