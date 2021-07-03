@@ -33,5 +33,5 @@ class Logger:
         new_logger.addHandler(file_handler)
         new_logger.addHandler(stream_handler)
 
-        new_logger.info('Initialize Log')
+        new_logger.info(f'Initialize Logger for: {log_name}')
         return new_logger

@@ -75,7 +75,7 @@ class Database:
             '_id': 0,
             'status': 0
         })
-        self.logger.info(f'found {res.count()}')
+        self.logger.info(f'found {res.count()} dates')
         return res
 
     def create_collection(self):
