@@ -30,13 +30,17 @@ $ cd HebrewCourtVerdictsAnalyzer/
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ pip3 install -r requirements/requirements.txt
+$ deactivate # when you're done
 ```
 
 #### Windows
 ```shell
-$ python3 -m venv venv
-$ venv\Scripts\activate.bat
+$ pip install virtualenv
+$ cd HebrewCourtVerdictsAnalyzer
+$ virtualenv --python C:\Path\To\Python\python.exe venv
+$ .\venv\Scripts\activate
 (venv) $ pip3 install -r requirements/requirements.txt
+$ deactivate # when you're done
 ```
 
 ### ELK stack
