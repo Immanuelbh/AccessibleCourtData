@@ -26,18 +26,21 @@ class App:
         date = date['date']
         self.logger.info(f'starting thread #{threading.current_thread().name} for date: {date}')
         try:
-            cases = scraper.get(date)
+            scraper.get(date)
+            # cases = scraper.get(date)
             self.logger.info(f'saving {date} cases to filesystem')
-            for i, case in enumerate(cases, start=1):
-                name = f'{date}__{i}.json'
-                save_data(case, name, constants.SCRAPED_DIR)
-                self.logger.info(f'saved {name}')
-
-            self.db.update_status(date, 'done')  # TODO add empty/not empty
+            # self.save_cases(cases, date)
+            self.db.update_status(date, 'done')
         except Exception as e:
             self.logger.info(f'failed to scrape date: {date}, reason: {e}')
-            self.db.update_status(date, 'error')  # TODO add empty/not empty
+            self.db.update_status(date, 'error')
         self.logger.info(f'thread #{threading.current_thread().name} finished')
+
+    def save_cases(self, cases, date):
+        for i, case in enumerate(cases, start=1):
+            name = f'{date}__{i}.json'
+            save_data(case, name, constants.SCRAPED_DIR)
+            self.logger.info(f'saved {name}')
 
 
 def main():

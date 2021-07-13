@@ -15,7 +15,7 @@ NUM_OF_CRAWLERS = os.getenv('NUM_OF_CRAWLERS', 2)
 ELASTIC_INDEX_NAME = os.getenv('ELASTIC_INDEX_NAME', 'default_index')
 
 # mongo
-COLLECTION_NAME = 'v3'
+COLLECTION_NAME = 'dates'
 
 # directories #
 ROOT_DIR = os.path.abspath(os.curdir)

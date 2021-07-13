@@ -1,6 +1,7 @@
 import time
 from hcva.scraper.crawler import Crawler
 from hcva.utils import constants
+from hcva.utils.json import save_data
 from hcva.utils.time import call_sleep
 from hcva.utils.logger import Logger
 
@@ -247,12 +248,21 @@ def get(date):
     crawler = Crawler(url=url)  # TODO make sure page is fully loaded
     time.sleep(5)
     num_cases = get_num_cases(crawler)
-    cases = []
+    # cases = []
     for i in range(num_cases, 0, -1):  # get from last to first
-        case_details = get_case_details(crawler, i)
-        if case_details is not None:
-            cases.append(case_details)
+        cd = get_case_details(crawler, i)
+        save_case(cd, date, i)
+
+        # case_details = get_case_details(crawler, i)
+        # if case_details is not None:
+        #     cases.append(case_details)
 
     crawler.close()
-    cases.reverse()
-    return cases
+    # cases.reverse()
+    # return cases
+
+
+def save_case(cd, date, i):
+    name = f'{date}__{i}.json'
+    save_data(cd, name, constants.SCRAPED_DIR)
+    logger.info(f'saved {name}')
