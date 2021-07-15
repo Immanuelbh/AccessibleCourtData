@@ -1,3 +1,4 @@
+import os
 import threading
 from platform import system
 from selenium import webdriver
@@ -34,7 +35,11 @@ class Crawler:
         if browser == 'chrome':
             return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
-            return webdriver.Firefox(executable_path=GeckoDriverManager().install())
+            if os.path.isfile('geckodriver'):
+                driver = 'geckodriver'
+            else:
+                driver = GeckoDriverManager().install()
+            return webdriver.Firefox(executable_path=driver)
         elif browser == 'edge':
             if system() == 'Windows':
                 return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
