@@ -9,6 +9,8 @@ DB_URI = os.getenv('MONGO_DB_URI', f'mongodb://root:example@localhost:27017/{DB_
 
 # crawler
 BROWSER_TYPE = os.getenv('BROWSER_TYPE', 'chrome')
+OS_TYPE = os.getenv('OS_TYPE', 'linux')
+HEADLESS = os.getenv('HEADLESS', True)
 NUM_OF_CRAWLERS = os.getenv('NUM_OF_CRAWLERS', 2)
 
 # elastic

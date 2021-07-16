@@ -24,22 +24,39 @@ class Crawler:
 
     def __init__(self, url):
         self._logger = Logger(f'crawler_{threading.current_thread().name}.log', constants.LOG_DIR).get_logger()
-        self._driver = self.get_browser(constants.BROWSER_TYPE)
-        self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
-        self.update_page(url)  # open url
+        self._driver = self.get_browser()
+        # self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
+        self._driver.get(url)  # open url
+        # self.update_page(url)  # open url
         self._logger.info('crawler created')
 
     # Functions
-    def get_browser(self, browser):
+    # def get_filepath(self, b, ost):
+    #     if b == 'fire'
+
+
+    def get_browser(self):
+        browser = constants.BROWSER_TYPE
+        os_type = constants.OS_TYPE
         self._logger.debug(f'attempting to open browser: {browser}')
+        # fp = self.get_filepath(browser, os_type)
         if browser == 'chrome':
             return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
-            if os.path.isfile('geckodriver'):
-                driver = 'geckodriver'
-            else:
-                driver = GeckoDriverManager().install()
-            return webdriver.Firefox(executable_path=driver)
+            driver_path = constants.ROOT_DIR + f'/hcva/scraper/crawler/web_drivers/{os_type}/geckodriver'
+
+            options = webdriver.FirefoxOptions()
+            if constants.HEADLESS:
+                options.add_argument("--headless")
+
+            # filepath = '/Users/i535952/Projects/Other/Personal/HIT/HebrewCourtVerdictsAnalyzer/hcva/scraper/web_drivers/macos/geckodriver'
+            # if os.path.isfile(driver_path):
+                # driver = '/Users/i535952/.wdm/drivers/geckodriver/macos/v0.29.1/geckodriver'
+                # driver = driver_path
+            # else:
+            #     driver = GeckoDriverManager(path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/macos').install()
+            return webdriver.Firefox(firefox_options=options, executable_path=driver_path)
+            # return webdriver.Firefox(firefox_options=options, executable_path=driver)
         elif browser == 'edge':
             if system() == 'Windows':
                 return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')

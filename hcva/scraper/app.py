@@ -1,5 +1,5 @@
 import threading
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 from hcva.utils import constants
 from hcva.utils.json import save_data
 from hcva.scraper import scraper
@@ -19,8 +19,14 @@ class App:
 
     def run(self):
         dates = self.db.get_dates()
+        # futures = []
         with ThreadPoolExecutor(max_workers=self.threads) as executor:
             executor.map(self.scrape, dates)
+            # for date in dates:
+            #     futures.append(
+            #         executor.submit(self.scrape, date)
+            #     )
+        # wait(futures)
 
     def scrape(self, date):
         date = date['date']
