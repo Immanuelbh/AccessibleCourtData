@@ -44,9 +44,9 @@ class Crawler:
             return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
             driver_path = constants.ROOT_DIR + f'/hcva/scraper/crawler/web_drivers/{os_type}/geckodriver'
-
+            self._logger.info('driver path:' + driver_path)
             options = webdriver.FirefoxOptions()
-            if constants.HEADLESS:
+            if constants.HEADLESS == 'true':
                 options.add_argument("--headless")
 
             # filepath = '/Users/i535952/Projects/Other/Personal/HIT/HebrewCourtVerdictsAnalyzer/hcva/scraper/web_drivers/macos/geckodriver'
