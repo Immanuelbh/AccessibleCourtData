@@ -43,7 +43,7 @@ class Crawler:
         if browser == 'chrome':
             return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
-            driver_path = constants.ROOT_DIR + f'/hcva/scraper/crawler/web_drivers/{os_type}/geckodriver'
+            driver_path = constants.ROOT_DIR + f'/hcva/scraper/web_drivers/{os_type}/geckodriver'
             self._logger.info('driver path:' + driver_path)
             options = webdriver.FirefoxOptions()
             if constants.HEADLESS == 'true':
