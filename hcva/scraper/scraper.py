@@ -247,15 +247,19 @@ def get(date):
     url = build_url(date)
     crawler = Crawler(url=url)  # TODO make sure page is fully loaded
     time.sleep(5)
-    num_cases = get_num_cases(crawler)
-    # cases = []
-    for i in range(num_cases, 0, -1):  # get from last to first
-        cd = get_case_details(crawler, i)
-        save_case(cd, date, i)
+    try:
+        num_cases = get_num_cases(crawler)
+        # cases = []
+        for i in range(num_cases, 0, -1):  # get from last to first
+            cd = get_case_details(crawler, i)
+            save_case(cd, date, i)
 
-        # case_details = get_case_details(crawler, i)
-        # if case_details is not None:
-        #     cases.append(case_details)
+            # case_details = get_case_details(crawler, i)
+            # if case_details is not None:
+            #     cases.append(case_details)
+    except Exception as e:
+        logger.info(f'failed to scrape date: {date}, reason: {e}')
+        crawler.close()
 
     crawler.close()
     # cases.reverse()
