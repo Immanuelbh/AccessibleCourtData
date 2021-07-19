@@ -1,7 +1,6 @@
 import threading
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor
 from hcva.utils import constants
-from hcva.utils.json import save_data
 from hcva.scraper import scraper
 from hcva.utils.database import Database
 from hcva.utils.logger import Logger
@@ -19,34 +18,20 @@ class App:
 
     def run(self):
         dates = self.db.get_dates()
-        # futures = []
         with ThreadPoolExecutor(max_workers=self.threads) as executor:
             executor.map(self.scrape, dates)
-            # for date in dates:
-            #     futures.append(
-            #         executor.submit(self.scrape, date)
-            #     )
-        # wait(futures)
 
     def scrape(self, date):
         date = date['date']
         self.logger.info(f'starting thread #{threading.current_thread().name} for date: {date}')
         try:
             scraper.get(date)
-            # cases = scraper.get(date)
             self.logger.info(f'saving {date} cases to filesystem')
-            # self.save_cases(cases, date)
             self.db.update_status(date, 'done')
         except Exception as e:
             self.logger.info(f'failed to scrape date: {date}, reason: {e}')
             self.db.update_status(date, 'error')
         self.logger.info(f'thread #{threading.current_thread().name} finished')
-
-    def save_cases(self, cases, date):
-        for i, case in enumerate(cases, start=1):
-            name = f'{date}__{i}.json'
-            save_data(case, name, constants.SCRAPED_DIR)
-            self.logger.info(f'saved {name}')
 
 
 def main():

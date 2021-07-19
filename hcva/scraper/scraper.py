@@ -6,8 +6,6 @@ from hcva.utils.time import call_sleep
 from hcva.utils.logger import Logger
 
 logger = Logger('scraper.log', constants.LOG_DIR).get_logger()
-
-
 BASE_URL = 'https://supreme.court.gov.il/Pages/SearchJudgments.aspx?&DateType=2&freeText=null&CaseNumber=null'
 
 
@@ -245,25 +243,18 @@ def get_case_details(crawler, index):
 def get(date):
     logger.info(f'scraping date: {date}')
     url = build_url(date)
-    crawler = Crawler(url=url)  # TODO make sure page is fully loaded
+    crawler = Crawler(url=url)
     time.sleep(5)
     try:
         num_cases = get_num_cases(crawler)
-        # cases = []
         for i in range(num_cases, 0, -1):  # get from last to first
             cd = get_case_details(crawler, i)
             save_case(cd, date, i)
-
-            # case_details = get_case_details(crawler, i)
-            # if case_details is not None:
-            #     cases.append(case_details)
     except Exception as e:
         logger.info(f'failed to scrape date: {date}, reason: {e}')
         crawler.close()
 
     crawler.close()
-    # cases.reverse()
-    # return cases
 
 
 def save_case(cd, date, i):
