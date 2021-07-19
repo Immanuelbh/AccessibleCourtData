@@ -32,7 +32,6 @@ class Crawler:
         browser = constants.BROWSER_TYPE
         os_type = constants.OS_TYPE
         self._logger.debug(f'attempting to open browser: {browser}')
-        # fp = self.get_filepath(browser, os_type)
         if browser == 'chrome':
             return webdriver.Chrome(executable_path=ChromeDriverManager().install())
         elif browser == 'firefox':
@@ -56,26 +55,6 @@ class Crawler:
         if update:
             return self._text_query
         return None
-
-    # input - url as string
-    # output - return true if succeed else false
-    # do - load the url for the crawler
-    def update_page(self, url=None):
-        result = False
-        if url is not None:
-            if type(url) is str:
-                self._driver.get(url)
-                # TODO check if page loaded aka code 200
-                self._url = url
-                message = f'URL change to: {url}'
-                result = True
-            else:
-                message = 'URL input was not string'
-        else:
-            message = 'Did not get new URL to load'
-
-        self._logger.info(message)
-        return result
 
     # output - return True if successful
     # do - close web driver

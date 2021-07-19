@@ -105,8 +105,8 @@ class Elastic:
                 json_id = json_data['Doc Details']['מספר הליך']  # Take procedure number from json file
                 elasticsearch_id = build_elasticsearch_id(json_id=json_id)
                 return elasticsearch_id, json_data
-            except:
-                self._logger.info("error while trying to load file")
+            except Exception as e:
+                self._logger.info(f"error while trying to load file, {e}")
                 return None, None
 
     def upload(self, id_, data):
