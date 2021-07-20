@@ -1,4 +1,6 @@
 import os
+import platform
+
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -9,7 +11,7 @@ DB_URI = os.getenv('MONGO_DB_URI', f'mongodb://root:example@localhost:27017/{DB_
 
 # crawler
 BROWSER_TYPE = os.getenv('BROWSER_TYPE', 'chrome')
-OS_TYPE = os.getenv('OS_TYPE', 'linux')
+OS_TYPE = os.getenv('OS_TYPE', platform.system())
 HEADLESS = os.getenv('HEADLESS', 'true')
 NUM_OF_CRAWLERS = os.getenv('NUM_OF_CRAWLERS', '2')
 
