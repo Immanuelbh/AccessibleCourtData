@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, TransportError
 from hcva.elastic.validation.schema_validation import validate_schema
 from hcva.utils import constants
 from hcva.utils.json import save_data, read_data
@@ -111,7 +111,10 @@ class Elastic:
 
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=constants.ELASTIC_INDEX_NAME, id=id_, body=data)
+        try:
+            res = self.elastic.index(index=constants.ELASTIC_INDEX_NAME, id=id_, body=data)
+        except TransportError as e:
+            self._logger.error(e.info)
         self._logger.info(f"file {res['result']}")
         return res
 
