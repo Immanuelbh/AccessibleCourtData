@@ -51,18 +51,21 @@ class Elastic:
     def init_index(self):
         self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX_NAME}")
         index = read_data('', constants.ELASTIC_INDEX_PATH)
-        response = self.elastic.indices.create(
-            index=constants.ELASTIC_INDEX_NAME,
-            body=index,
-            ignore=400
-        )
-        if 'acknowledged' in response:
-            if response['acknowledged']:
-                self._logger.info(f'index created: {response["index"]}')
-                return True
-        elif 'error' in response:
-            self._logger.error("ERROR:", response['error']['root_cause'])
-            self._logger.error("TYPE:", response['error']['type'])
+        if self.elastic.indices.exists(index=constants.ELASTIC_INDEX_NAME):
+            return True
+        else:
+            response = self.elastic.indices.create(
+                index=constants.ELASTIC_INDEX_NAME,
+                body=index,
+                ignore=400
+            )
+            if 'acknowledged' in response:
+                if response['acknowledged']:
+                    self._logger.info(f'index created: {response["index"]}')
+                    return True
+            elif 'error' in response:
+                self._logger.error(f"ERROR: {response['error']['root_cause']}")
+                self._logger.error(f"TYPE: {response['error']['type']}")
         return False
 
     def run(self):
