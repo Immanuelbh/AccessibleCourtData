@@ -235,21 +235,27 @@ def move_file(data, file_name, source_folder, dest_folder):
 def parse(case):
     case['Doc Details'], success = parser(case['Doc Details'])  # if succeed Dict, else text
     if success:
-        for key in case['Doc Info']:
-            case['Doc Details'][key] = case['Doc Info'][key] if key != 'עמודים' \
-                else [int(s) for s in case['Doc Info'][key].split() if s.isdigit()][0]
-        case.pop('Doc Info', None)
+        case['Doc Info'].pop('עמודים')
+        case['Doc Details'] = {**case['Doc Details'], **case['Doc Info']}
+        case.pop('Doc Info')
+        # for key in case['Doc Info']:
+        #     case['Doc Details'][key] = case['Doc Info'][key] if key != 'עמודים' \
+        #         else [int(s) for s in case['Doc Info'][key].split() if s.isdigit()][0]
+        # case.pop('Doc Info', None)
         return case
 
     return None
 
 
-def is_valid(case):
+def is_valid(logger, case):
     if len(case) < 1:
+        logger.error('length is 0')
         return False
     elif not case['Doc Details']:
+        logger.error('missing "Doc Details"')
         return False
     elif 'פני:' not in str(case['Doc Details']):
+        logger.error('missing "פני"')
         return False
 
     return True
@@ -269,7 +275,7 @@ def run(logger, cases):
     for case in cases:
         logger.info(f'trying to parse {case}...')
         c = read_data(case, constants.SCRAPED_DIR)
-        if c and is_valid(c):
+        if c and is_valid(logger, c):
             logger.info(f'read {case} successfully')
             p = parse(c)
             if p:
