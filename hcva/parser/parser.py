@@ -235,13 +235,9 @@ def move_file(data, file_name, source_folder, dest_folder):
 def parse(case):
     case['Doc Details'], success = parser(case['Doc Details'])  # if succeed Dict, else text
     if success:
-        case['Doc Info'].pop('עמודים')
         case['Doc Details'] = {**case['Doc Details'], **case['Doc Info']}
         case.pop('Doc Info')
-        # for key in case['Doc Info']:
-        #     case['Doc Details'][key] = case['Doc Info'][key] if key != 'עמודים' \
-        #         else [int(s) for s in case['Doc Info'][key].split() if s.isdigit()][0]
-        # case.pop('Doc Info', None)
+        case['Doc Details']['עמודים'] = int(case['Doc Details']['עמודים'].split()[0])
         return case
 
     return None
