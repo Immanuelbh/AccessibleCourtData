@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, TransportError
 from hcva.elastic.validation.schema_validation import validate_schema
 from hcva.utils import constants
 from hcva.utils.json import save_data, read_data
@@ -51,18 +51,21 @@ class Elastic:
     def init_index(self):
         self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX_NAME}")
         index = read_data('', constants.ELASTIC_INDEX_PATH)
-        response = self.elastic.indices.create(
-            index=constants.ELASTIC_INDEX_NAME,
-            body=index,
-            ignore=400
-        )
-        if 'acknowledged' in response:
-            if response['acknowledged']:
-                self._logger.info(f'index created: {response["index"]}')
-                return True
-        elif 'error' in response:
-            self._logger.error("ERROR:", response['error']['root_cause'])
-            self._logger.error("TYPE:", response['error']['type'])
+        if self.elastic.indices.exists(index=constants.ELASTIC_INDEX_NAME):
+            return True
+        else:
+            response = self.elastic.indices.create(
+                index=constants.ELASTIC_INDEX_NAME,
+                body=index,
+                ignore=400
+            )
+            if 'acknowledged' in response:
+                if response['acknowledged']:
+                    self._logger.info(f'index created: {response["index"]}')
+                    return True
+            elif 'error' in response:
+                self._logger.error(f"ERROR: {response['error']['root_cause']}")
+                self._logger.error(f"TYPE: {response['error']['type']}")
         return False
 
     def run(self):
@@ -105,13 +108,16 @@ class Elastic:
                 json_id = json_data['Doc Details']['מספר הליך']  # Take procedure number from json file
                 elasticsearch_id = build_elasticsearch_id(json_id=json_id)
                 return elasticsearch_id, json_data
-            except:
-                self._logger.info("error while trying to load file")
+            except Exception as e:
+                self._logger.info(f"error while trying to load file, {e}")
                 return None, None
 
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
-        res = self.elastic.index(index=constants.ELASTIC_INDEX_NAME, id=id_, body=data)
+        try:
+            res = self.elastic.index(index=constants.ELASTIC_INDEX_NAME, id=id_, body=data)
+        except TransportError as e:
+            self._logger.error(e.info)
         self._logger.info(f"file {res['result']}")
         return res
 

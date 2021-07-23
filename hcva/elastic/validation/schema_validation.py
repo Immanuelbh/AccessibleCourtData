@@ -17,8 +17,8 @@ def validate_schema(data_file):
         with open(SCHEMA, encoding='utf-8') as json_schema:
             schema = json.load(json_schema)
         return bool(jsonschema.validate(elastic_data, schema) is None)
-    except:
-        print('failed to open files')
+    except Exception as e:
+        print(f'failed to open files, {e}')
         return False
 
 

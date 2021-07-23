@@ -28,22 +28,3 @@ def create_dir(dir_name):
         n = 1 if system() == 'Windows' else 2  # in case system is not windows - splitPath will have sep at the end
         create_dir(get_path(dir_name, n=n))  # create parent target folder
         create_dir(dir_name)  # create target folder
-
-
-# move file\folder from oldPath to newPath, fileName can be inside oldPath
-def change_dir(src, dest, file_name=None, delete_src_if_dest_exist=False, delete_dest_if_dest_exist=False):
-    try:
-        move(src, dest) if file_name is None else move(src + file_name, dest)
-    except fileExistError as _:  # handle a duplicate file
-        print("file already exist in new path - ", end='')
-        if delete_src_if_dest_exist:
-            remove(src) if file_name is None else remove(src + file_name)
-            print("file deleted in source path")
-        elif delete_dest_if_dest_exist:
-            n = 1 if system() == 'Windows' else 2
-            file_path = dest + file_name if file_name is not None else dest + src.split(sep)[-n]
-            remove(file_path)
-            print("file deleted in destination path")
-            change_dir(src, dest, file_name, delete_src_if_dest_exist, False)
-        else:
-            print("no delete permission was given")

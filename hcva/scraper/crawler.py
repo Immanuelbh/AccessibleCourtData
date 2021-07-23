@@ -1,3 +1,4 @@
+import os
 import threading
 from platform import system
 from selenium import webdriver
@@ -14,6 +15,17 @@ from hcva.utils import constants
 from hcva.utils.logger import Logger
 
 
+def get_os_type():
+    os_type = constants.OS_TYPE
+    if os_type == 'Linux':
+        return 'linux'
+    elif os_type == 'Darwin':
+        return 'macos'
+    elif os_type == 'Windows':
+        return 'windows'
+    return os_type
+
+
 class Crawler:
     _driver = None  # Web Driver
     _delay = 2  # Timer for finding web element as int
@@ -23,21 +35,35 @@ class Crawler:
 
     def __init__(self, url):
         self._logger = Logger(f'crawler_{threading.current_thread().name}.log', constants.LOG_DIR).get_logger()
-        self._driver = self.get_browser(constants.BROWSER_TYPE)
-        self._driver.maximize_window()  # fullscreen_window()  # Maximize browser window
-        self.update_page(url)  # open url
+        self._driver = self.get_browser()
+        self._driver.get(url)
         self._logger.info('crawler created')
 
-    # Functions
-    def get_browser(self, browser):
+    def get_browser(self):
+        browser = constants.BROWSER_TYPE
+        os_type = get_os_type()
+        driver_prefix = constants.ROOT_DIR + f'/hcva/scraper/web_drivers/{os_type}'
+        driver_postfix = ''
+        if os_type == 'windows':
+            driver_postfix = '.exe'
+
         self._logger.debug(f'attempting to open browser: {browser}')
         if browser == 'chrome':
-            return webdriver.Chrome(executable_path=ChromeDriverManager().install())
+            driver_prefix += '/chromedriver'
+
+            options = webdriver.ChromeOptions()
+            if constants.HEADLESS == 'true':
+                options.add_argument("--headless")
+
+            return webdriver.Chrome(chrome_options=options, executable_path=driver_prefix+driver_postfix)
         elif browser == 'firefox':
-            return webdriver.Firefox(executable_path=GeckoDriverManager().install())
-        elif browser == 'edge':
-            if system() == 'Windows':
-                return webdriver.Edge(executable_path=constants.ROOT_DIR + '/hcva/scraper/crawler/web_drivers/msedgedriver.exe')
+            driver_prefix += '/geckodriver'
+
+            options = webdriver.FirefoxOptions()
+            if constants.HEADLESS == 'true':
+                options.add_argument("--headless")
+
+            return webdriver.Firefox(firefox_options=options, executable_path=driver_prefix+driver_postfix)
         else:
             self._logger.error(f'browser type is invalid: ${browser}')
 
@@ -48,26 +74,6 @@ class Crawler:
         if update:
             return self._text_query
         return None
-
-    # input - url as string
-    # output - return true if succeed else false
-    # do - load the url for the crawler
-    def update_page(self, url=None):
-        result = False
-        if url is not None:
-            if type(url) is str:
-                self._driver.get(url)
-                # TODO check if page loaded aka code 200
-                self._url = url
-                message = f'URL change to: {url}'
-                result = True
-            else:
-                message = 'URL input was not string'
-        else:
-            message = 'Did not get new URL to load'
-
-        self._logger.info(message)
-        return result
 
     # output - return True if successful
     # do - close web driver
