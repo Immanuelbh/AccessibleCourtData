@@ -239,6 +239,10 @@ def parse(case):
         case.pop('Doc Info')
         if case['Doc Details']['עמודים']:
             case['Doc Details']['עמודים'] = int(case['Doc Details']['עמודים'].split()[0])
+
+        if '' in case['Doc Details']:
+            del case['Doc Details']['']
+
         return case
 
     return None
