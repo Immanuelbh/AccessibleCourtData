@@ -240,8 +240,8 @@ def parse(case):
         if case['Doc Details']['עמודים']:
             case['Doc Details']['עמודים'] = int(case['Doc Details']['עמודים'].split()[0])
 
-        if '' in case['Doc Details']:
-            del case['Doc Details']['']
+        if '' in case['Case Details']:
+            del case['Case Details']['']
 
         return case
 
