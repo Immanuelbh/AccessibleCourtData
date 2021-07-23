@@ -237,7 +237,8 @@ def parse(case):
     if success:
         case['Doc Details'] = {**case['Doc Details'], **case['Doc Info']}
         case.pop('Doc Info')
-        case['Doc Details']['עמודים'] = int(case['Doc Details']['עמודים'].split()[0])
+        if case['Doc Details']['עמודים']:
+            case['Doc Details']['עמודים'] = int(case['Doc Details']['עמודים'].split()[0])
         return case
 
     return None
