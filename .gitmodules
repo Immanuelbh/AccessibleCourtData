@@ -2,3 +2,6 @@
 	path = env/env-set-up
 	url = https://github.com/Immanuelbh/HCVA-env-set-up.git
     branch = release-7.x
+[submodule "hcva/parser/enricher"]
+	path = hcva/parser/enricher
+	url = https://github.com/io-commits/hcva-ml.git

@@ -1,4 +1,6 @@
+from hcva.parser.enricher.Normalizer import Normalizer
 from hcva.parser.new_schema import add_new_schema
+from hcva.parser.normalizer import normalize
 from hcva.utils import constants
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
@@ -263,8 +265,10 @@ def is_valid(logger, case):
 
 
 def parser_flow(parsed):
-    p = add_new_schema(parsed)
-    return p
+    # normalized = Normalizer().no.Enrich(parsed)
+    normalized = normalize(parsed)
+    # p = add_new_schema(parsed)
+    return normalized
 
 
 def run(logger, cases):
