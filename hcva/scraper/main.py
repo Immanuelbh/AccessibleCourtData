@@ -1,7 +1,7 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from hcva.scraper.scraper import get
 from hcva.utils import constants
-from hcva.scraper import scraper
 from hcva.utils.database import Database
 from hcva.utils.logger import Logger
 from hcva.utils.path import create_dir
@@ -14,7 +14,7 @@ def scrape(date):
     date = date['date']
     logger.info(f'starting thread #{threading.current_thread().name} for date: {date}')
     try:
-        scraper.get(date)
+        get(date)
         logger.info(f'saving {date} cases to filesystem')
         db.update_status(date, 'done')
     except Exception as e:
@@ -23,14 +23,10 @@ def scrape(date):
     logger.info(f'thread #{threading.current_thread().name} finished')
 
 
-def main():
+def scraper():
     create_dir(constants.SCRAPED_DIR)
     db.init_collection(constants.DB_NAME, constants.COLLECTION_NAME)
     dates = db.get_dates()
     threads = int(constants.NUM_OF_CRAWLERS)
     with ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(scrape, dates)
-
-
-if __name__ == "__main__":
-    main()
