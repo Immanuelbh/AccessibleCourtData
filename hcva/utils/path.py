@@ -1,8 +1,7 @@
 from glob import glob
-from shutil import move, Error as fileExistError
 from pathlib import Path
 from platform import system
-from os import sep, path, mkdir, remove
+from os import sep, path, mkdir
 
 
 # do - return current path if didn't got oldPath and remove N folders from the end
