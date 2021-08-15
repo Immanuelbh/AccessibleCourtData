@@ -163,7 +163,7 @@ def i_got_it_all(temp_dict, key_list):
     return True
 
 
-def parser(case_text):
+def parse_case(case_text):
     doc_dict = dict()
     add_token, temp_key, values_list, num_of_values, lines_to_skip = False, None, None, 1, []
     case_text = drop_extra_info(case_text)
@@ -233,7 +233,7 @@ def move_file(data, file_name, source_folder, dest_folder):
 
 
 def parse(case):
-    case['Doc Details'], success = parser(case['Doc Details'])  # if succeed Dict, else text
+    case['Doc Details'], success = parse_case(case['Doc Details'])  # if succeed Dict, else text
     if success:
         case['Doc Details'] = {**case['Doc Details'], **case['Doc Info']}
         case.pop('Doc Info')
@@ -309,7 +309,7 @@ def get_cases(path_):
     return get_names(files)
 
 
-def main():
+def parser():
     logger = Logger('parser.log', constants.LOG_DIR).get_logger()
     logger.info("parser is starting")
     create_dir(constants.PARSED_SUCCESS_DIR)
@@ -319,7 +319,3 @@ def main():
         cases = get_cases(constants.SCRAPED_DIR)
         run(logger, cases)
         call_sleep(logger=logger, minutes=10)
-
-
-if __name__ == '__main__':
-    main()
