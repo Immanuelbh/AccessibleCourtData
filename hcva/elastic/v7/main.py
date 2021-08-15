@@ -122,17 +122,14 @@ class Elastic:
         return res
 
 
-def main():
+def elastic():
     logger = Logger('elasticsearch.log', constants.LOG_DIR).get_logger()
-    elastic = Elastic(logger)
-    index_created = elastic.init_index()
+    e = Elastic(logger)
+    index_created = e.init_index()
     if index_created:
         logger.info(f"{constants.ELASTIC_INDEX_NAME} index created successfully")
         while True:
-            elastic.run()
-            elastic.save_all()
+            e.run()
+            e.save_all()
             call_sleep(logger=logger, minutes=10)
 
-
-if __name__ == '__main__':
-    main()

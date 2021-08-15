@@ -1,7 +1,7 @@
 import sys
-from hcva.elastic.v7.elastic import main as elastic
-from hcva.parser.parser import main as parser
-from hcva.scraper.app import main as scraper
+from hcva.scraper.main import scraper
+from hcva.parser.main import parser
+from hcva.elastic.v7.main import elastic
 
 if __name__ == '__main__':
     functions = {1: scraper,
