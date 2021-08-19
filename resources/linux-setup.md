@@ -16,7 +16,7 @@
 ### Pip3
 `$ sudo apt-get -y install python3-pip`
 
-# Docker (from the official documentation)
+### Docker (from the official documentation)
 Installing the repository
 1. `sudo apt-get remove docker docker-engine docker.io containerd runc`
 2. `sudo apt-get update`
@@ -31,11 +31,11 @@ Installing the repository
    "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null`
 
-Installing Docker Engine
+#### Installing Docker Engine
 6. `sudo apt-get update`
 7. `sudo apt-get install docker-ce docker-ce-cli containerd.io`
 
-Test
+#### Test
 8. `sudo docker run hello-world`
 
 Finally, add privileges to users:
