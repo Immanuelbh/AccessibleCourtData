@@ -10,6 +10,8 @@
 - [Docker-compose](https://docs.docker.com/compose/install/)
 - [Git](https://git-scm.com/downloads)
 
+**[Setting up on a new linux server](/resources/linux-setup.md)
+
 ## Installation
 Overall flow:
 - Clone project
