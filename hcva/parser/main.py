@@ -2,7 +2,7 @@ from hcva.parser.new_schema import add_new_schema
 from hcva.utils import constants
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import create_dir, remove, get_all_files
+from hcva.utils.path import create_dir, get_all_files
 from hcva.utils.time import call_sleep
 
 
@@ -227,7 +227,7 @@ def parse_case(case_text):
 
 
 def move_file(data, file_name, source_folder, dest_folder):
-    remove(file_name)  # delete old copy
+    # remove(file_name)  # delete old copy
     file_name = file_name.replace(source_folder, '')  # extract file name
     save_data(data, file_name, dest_folder)  # save new copy
 
