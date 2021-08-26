@@ -1,8 +1,9 @@
 import sys
 from hcva.scraper.main import scraper
 from hcva.parser.main import parser
-from hcva.parser.enricher.main import normalizer
 from hcva.elastic.v7.main import elastic
+from hcva.utils import constants as settings
+from hcvaEnricher.main import normalizer
 
 if __name__ == '__main__':
     functions = {1: scraper,
@@ -23,7 +24,7 @@ if __name__ == '__main__':
 
     if len(functions) >= choice > 0:
         func = functions[choice]
-        func()
+        func(settings)
 
 
 print('DONE')
