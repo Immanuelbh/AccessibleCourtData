@@ -12,3 +12,4 @@ products/
 logs/
 cases/
 models/
+geckodriver.log
