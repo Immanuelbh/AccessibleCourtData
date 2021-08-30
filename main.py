@@ -3,12 +3,12 @@ from hcva.scraper.main import scraper
 from hcva.parser.main import parser
 from hcva.elastic.v7.main import elastic
 from hcva.utils import constants as settings
-from hcvaEnricher.main import normalizer
+from hcvaEnricher.main import enricher
 
 if __name__ == '__main__':
     functions = {1: scraper,
                  2: parser,
-                 3: normalizer,
+                 3: enricher,
                  4: elastic,
                  }
 
