@@ -34,9 +34,10 @@ PARSED_FAILED_VALIDATION_DIR = OUTPUT_DIR + 'parsed/failed_validation/'
 # normalizer
 NORMALIZED_SUCCESS_DIR = OUTPUT_DIR + 'normalized/success/'
 NORMALIZED_FAILED_DIR = OUTPUT_DIR + 'normalized/failed/'
-# normalizer
-NORMALIZED_SUCCESS_DIR = OUTPUT_DIR + 'classifier/success/'
-NORMALIZED_FAILED_DIR = OUTPUT_DIR + 'classifier/failed/'
+# classifier
+CLASSIFIED_SUCCESS_DIR = OUTPUT_DIR + 'classified/success/'
+CLASSIFIED_FAILED_DIR = OUTPUT_DIR + 'classified/failed/'
+CLASSIFIERS = ROOT_DIR + 'models/'
 # elastic
 ELASTIC_SUCCESS_DIR = OUTPUT_DIR + 'elastic/success_upload/'
 ELASTIC_FAILED_VALIDATION_DIR = OUTPUT_DIR + 'elastic/failed_validation/'
