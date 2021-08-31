@@ -37,7 +37,7 @@ NORMALIZED_FAILED_DIR = OUTPUT_DIR + 'normalized/failed/'
 # classifier
 CLASSIFIED_SUCCESS_DIR = OUTPUT_DIR + 'classified/success/'
 CLASSIFIED_FAILED_DIR = OUTPUT_DIR + 'classified/failed/'
-CLASSIFIERS = ROOT_DIR + 'models/'
+CLASSIFIERS = ROOT_DIR + '/models/'
 # elastic
 ELASTIC_SUCCESS_DIR = OUTPUT_DIR + 'elastic/success_upload/'
 ELASTIC_FAILED_VALIDATION_DIR = OUTPUT_DIR + 'elastic/failed_validation/'
