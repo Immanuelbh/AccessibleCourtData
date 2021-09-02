@@ -24,7 +24,10 @@ if __name__ == '__main__':
 
     if len(functions) >= choice > 0:
         func = functions[choice]
-        func(settings)
+        if choice == 3:
+            func(settings)
+        else:
+            func()
 
 
 print('DONE')
