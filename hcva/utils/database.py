@@ -1,13 +1,13 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from pymongo.errors import ServerSelectionTimeoutError
-from hcva.utils.date import init_dates
+from hcva.utils.date import init_dates, get_gap_dates
 from hcva.utils.logger import Logger
 from hcva.utils import constants
 
 
-def create_docs():
+def create_docs(dates):
     docs = []
-    dates = init_dates()
+    # dates = init_dates()
     for date in dates:
         doc = {
             'date': date,
@@ -70,7 +70,7 @@ class Database:
 
     def get_dates(self):
         res = self.collection.find({
-            'status': 'available'
+            'status': {'$in': ['available', 'error']}
         }, {
             '_id': 0,
             'status': 0
@@ -78,16 +78,29 @@ class Database:
         self.logger.info(f'found {res.count()} dates')
         return res
 
-    def create_collection(self):
-        docs = create_docs()
+    def get_latest_db_date(self):
+        latest_db_date = list(self.collection.find().sort('_id', -1).limit(1))
+        date = latest_db_date[0]['date']
+        return date
+
+    def insert_new_dates(self, dates):
+        docs = create_docs(dates)
         self.collection.insert_many(docs)
 
     def init_collection(self, db_name, collection_name):
         self.collection = self.client[db_name].get_collection(collection_name)
         if self.collection.count() == 0:
             self.logger.info(f'initializing collection: {collection_name}')
-            self.create_collection()
-
-        self.logger.info(f'collection @{collection_name} initialized')
-
+            self.insert_new_dates(init_dates())
+            self.logger.info(f'collection @{collection_name} initialized')
+        else:
+            self.logger.info(f'checking gap dates in collection: {collection_name}')
+            latest_db_date = self.get_latest_db_date()
+            gap_dates = get_gap_dates(latest_db_date)
+            if len(gap_dates) != 0:
+                self.logger.info(f'updating dates in collection: {collection_name}')
+                self.insert_new_dates(gap_dates)
+                self.logger.info(f'collection @{collection_name} was updated')
+            else:
+                self.logger.info(f'collection @{collection_name} is up to date')
         return self.collection
