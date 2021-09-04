@@ -1,4 +1,4 @@
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from hcva.utils.date import init_dates, get_gap_dates
 from hcva.utils.logger import Logger
@@ -7,7 +7,6 @@ from hcva.utils import constants
 
 def create_docs(dates):
     docs = []
-    # dates = init_dates()
     for date in dates:
         doc = {
             'date': date,

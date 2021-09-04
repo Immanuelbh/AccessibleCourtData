@@ -4,6 +4,7 @@ from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
 from hcva.utils.path import create_dir, get_all_files
 from hcva.utils.time import call_sleep
+logger = Logger('parser/main.log', constants.LOG_DIR).get_logger()
 
 
 def clean_spaces(text):
@@ -310,12 +311,12 @@ def get_cases(path_):
 
 
 def parser():
-    logger = Logger('parser.log', constants.LOG_DIR).get_logger()
-    logger.info("parser is starting")
     create_dir(constants.PARSED_SUCCESS_DIR)
     create_dir(constants.PARSED_FAILED_DIR)
     create_dir(constants.PARSED_FAILED_VALIDATION_DIR)
     while True:
+        logger.info("parser is starting")
         cases = get_cases(constants.SCRAPED_DIR)
         run(logger, cases)
-        call_sleep(logger=logger, minutes=10)
+        logger.info("parser has finished")
+        call_sleep(logger=logger, days=1)

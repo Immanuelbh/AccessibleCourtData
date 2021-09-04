@@ -7,7 +7,7 @@ from hcva.utils.logger import Logger
 from hcva.utils.path import create_dir
 from hcva.utils.time import call_sleep
 
-logger = Logger('app.log', constants.LOG_DIR).get_logger()
+logger = Logger('scraper/main.log', constants.LOG_DIR).get_logger()
 db = Database()
 
 
@@ -33,5 +33,5 @@ def scraper():
         threads = int(constants.NUM_OF_CRAWLERS)
         with ThreadPoolExecutor(max_workers=threads) as executor:
             executor.map(scrape, dates)
-        logger.info(f'scraper finished')
-        call_sleep(days=1)
+        logger.info(f'scraper has finished')
+        call_sleep(logger=logger, days=1)
