@@ -13,10 +13,6 @@ def get_path(old_path=None, n=0, end_sep=True):
     return new_path + '/' if end_sep else new_path  # path + sep if true else path
 
 
-def get_all_files(folder_name):
-    return [f for f in glob(folder_name + "/*.json")]
-
-
 # input - if dirName is string create folder at current path else create all the path
 def create_dir(dir_name):
     try:

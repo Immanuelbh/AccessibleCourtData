@@ -1,8 +1,23 @@
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
+from hcva.utils.case_utils import get_case_dates
 from hcva.utils.date import init_dates, get_gap_dates
 from hcva.utils.logger import Logger
 from hcva.utils import constants
+from enum import Enum
+
+
+class StatusType(Enum):
+    AVAILABLE = 'available'
+    DONE = 'done'
+    ERROR = 'error'
+
+
+def sync_existing_cases():
+    dates = get_case_dates(constants.CASES_PATH)
+    db = Database()
+    for date in dates:
+        db.update_status(date, StatusType.DONE)
 
 
 def create_docs(dates):
@@ -10,7 +25,7 @@ def create_docs(dates):
     for date in dates:
         doc = {
             'date': date,
-            'status': 'available'
+            'status': StatusType.AVAILABLE
         }
         docs.append(doc)
 
@@ -19,11 +34,13 @@ def create_docs(dates):
 
 class Database:
     logger = Logger('db.log', constants.LOG_DIR).get_logger()
-    collection = None
 
     def __init__(self):
         self.client = MongoClient(constants.DB_URI)
+        self.db_name = constants.DB_NAME
+        self.collection_name = constants.COLLECTION_NAME
         self.get_connection()
+        self.collection = self.client[self.db_name].get_collection(self.collection_name)
 
     def get_connection(self):
         try:
@@ -64,12 +81,12 @@ class Database:
     def create_date(self, date):
         self.collection.insert({
             'date': date,
-            'status': 'available'
+            'status': StatusType.AVAILABLE
         })
 
     def get_dates(self):
         res = self.collection.find({
-            'status': {'$in': ['available', 'error']}
+            'status': {'$in': [StatusType.AVAILABLE, StatusType.ERROR]}
         }, {
             '_id': 0,
             'status': 0
@@ -86,20 +103,19 @@ class Database:
         docs = create_docs(dates)
         self.collection.insert_many(docs)
 
-    def init_collection(self, db_name, collection_name):
-        self.collection = self.client[db_name].get_collection(collection_name)
+    def init_collection(self):
         if self.collection.count() == 0:
-            self.logger.info(f'initializing collection: {collection_name}')
+            self.logger.info(f'initializing collection: {self.collection_name}')
             self.insert_new_dates(init_dates())
-            self.logger.info(f'collection @{collection_name} initialized')
+            self.logger.info(f'collection @{self.collection_name} initialized')
         else:
-            self.logger.info(f'checking gap dates in collection: {collection_name}')
+            self.logger.info(f'checking gap dates in collection: {self.collection_name}')
             latest_db_date = self.get_latest_db_date()
             gap_dates = get_gap_dates(latest_db_date)
             if len(gap_dates) != 0:
-                self.logger.info(f'updating dates in collection: {collection_name}')
+                self.logger.info(f'updating dates in collection: {self.collection_name}')
                 self.insert_new_dates(gap_dates)
-                self.logger.info(f'collection @{collection_name} was updated')
+                self.logger.info(f'collection @{self.collection_name} was updated')
             else:
-                self.logger.info(f'collection @{collection_name} is up to date')
+                self.logger.info(f'collection @{self.collection_name} is up to date')
         return self.collection

@@ -1,8 +1,9 @@
 from hcva.parser.new_schema import add_new_schema
 from hcva.utils import constants
+from hcva.utils.case_utils import get_cases
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import create_dir, get_all_files
+from hcva.utils.path import create_dir
 from hcva.utils.time import call_sleep
 logger = Logger('parser/main.log', constants.LOG_DIR).get_logger()
 
@@ -294,20 +295,6 @@ def run(logger, cases):
             save_data(c, case, constants.PARSED_FAILED_VALIDATION_DIR)
     # TODO remove file from scraped?
     logger.info(f'finished parsing {len(cases)} cases')
-
-
-def get_names(files):
-    names = []
-    for file in files:
-        s = file.split("/")
-        n = s[len(s)-1]
-        names.append(n)
-    return names
-
-
-def get_cases(path_):
-    files = get_all_files(path_)
-    return get_names(files)
 
 
 def parser():
