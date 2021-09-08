@@ -4,10 +4,12 @@ import json
 from elasticsearch import Elasticsearch, TransportError
 from hcva.elastic.validation.schema_validation import validate_schema
 from hcva.utils import constants
+from hcva.utils.case_utils import get_all_files
 from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
-from hcva.utils.path import get_all_files, create_dir
+from hcva.utils.path import create_dir
+logger = Logger('elastic_v7_main.log', constants.LOG_DIR).get_logger()
 
 sys.path.insert(1, '../../..')
 
@@ -123,13 +125,14 @@ class Elastic:
 
 
 def elastic():
-    logger = Logger('elasticsearch.log', constants.LOG_DIR).get_logger()
     e = Elastic(logger)
     index_created = e.init_index()
     if index_created:
         logger.info(f"{constants.ELASTIC_INDEX_NAME} index created successfully")
         while True:
+            logger.info("elastic starting")
             e.run()
             e.save_all()
-            call_sleep(logger=logger, minutes=10)
+            logger.info("elastic has finished")
+            call_sleep(logger=logger, days=1)
 

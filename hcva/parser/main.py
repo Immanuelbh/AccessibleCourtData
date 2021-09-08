@@ -1,9 +1,11 @@
 from hcva.parser.new_schema import add_new_schema
 from hcva.utils import constants
+from hcva.utils.case_utils import get_cases
 from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
-from hcva.utils.path import create_dir, remove, get_all_files
+from hcva.utils.path import create_dir
 from hcva.utils.time import call_sleep
+logger = Logger('parser_main.log', constants.LOG_DIR).get_logger()
 
 
 def clean_spaces(text):
@@ -227,7 +229,7 @@ def parse_case(case_text):
 
 
 def move_file(data, file_name, source_folder, dest_folder):
-    remove(file_name)  # delete old copy
+    # remove(file_name)  # delete old copy
     file_name = file_name.replace(source_folder, '')  # extract file name
     save_data(data, file_name, dest_folder)  # save new copy
 
@@ -295,27 +297,13 @@ def run(logger, cases):
     logger.info(f'finished parsing {len(cases)} cases')
 
 
-def get_names(files):
-    names = []
-    for file in files:
-        s = file.split("/")
-        n = s[len(s)-1]
-        names.append(n)
-    return names
-
-
-def get_cases(path_):
-    files = get_all_files(path_)
-    return get_names(files)
-
-
 def parser():
-    logger = Logger('parser.log', constants.LOG_DIR).get_logger()
-    logger.info("parser is starting")
     create_dir(constants.PARSED_SUCCESS_DIR)
     create_dir(constants.PARSED_FAILED_DIR)
     create_dir(constants.PARSED_FAILED_VALIDATION_DIR)
     while True:
+        logger.info("parser is starting")
         cases = get_cases(constants.SCRAPED_DIR)
         run(logger, cases)
-        call_sleep(logger=logger, minutes=10)
+        logger.info("parser has finished")
+        call_sleep(logger=logger, days=1)

@@ -11,3 +11,5 @@ venv/
 products/
 logs/
 cases/
+models/
+geckodriver.log

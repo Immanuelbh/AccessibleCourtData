@@ -13,6 +13,7 @@ elasticsearch==7.12.1
 entrypoints==0.3
 future==0.17.1
 hypothesis==5.5.5
+git+https://github.com/io-commits/hcva-ml.git@connect#egg=hcvaEnricher
 idna==2.9
 importlib-metadata==1.6.0
 isort==5.8.0
@@ -21,7 +22,7 @@ keyring==18.0.1
 lazy-object-proxy==1.6.0
 mccabe==0.6.1
 more-itertools==8.6.0
-numpy==1.18.5
+numpy==1.19.0
 packaging==20.4
 pandas==1.1.4
 pluggy==0.13.1

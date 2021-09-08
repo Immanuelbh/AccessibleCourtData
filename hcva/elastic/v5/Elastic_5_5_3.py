@@ -268,7 +268,8 @@ def main():
     _logger = Logger('elasticsearch.log', get_path(n=0) + f'logs{sep}').get_logger()
     while True:
         Elastic_5_5_3(_logger).start_index()  # start index product to elastic DB
-        call_sleep(logger=_logger, minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
+        call_sleep(logger=_logger,
+                   minutes=10)  # after finished with all the files wait a bit - hours * minutes * seconds
 
 
 if __name__ == '__main__':
