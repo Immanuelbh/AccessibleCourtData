@@ -71,7 +71,7 @@ class Elastic:
         return False
 
     def run(self):
-        cases = get_all_files(folder_name=constants.PARSED_SUCCESS_DIR)
+        cases = get_all_files(folder_name=constants.CLASSIFIED_SUCCESS_DIR)
         self._logger.info(f'trying to upload {len(cases)} cases')
         self.push_cases(cases)
 
