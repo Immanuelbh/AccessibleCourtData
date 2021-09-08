@@ -5,6 +5,7 @@ from hcva.utils.date import init_dates, get_gap_dates
 from hcva.utils.logger import Logger
 from hcva.utils import constants
 from enum import Enum
+logger = Logger('db.log', constants.LOG_DIR).get_logger()
 
 
 class StatusType(Enum):
@@ -14,11 +15,15 @@ class StatusType(Enum):
 
 
 def sync_existing_cases():
-    dates = get_case_dates(constants.CASES_PATH)
-    db = Database()
-    db.init_collection()
-    for date in dates:
-        db.update_status(date, StatusType.DONE)
+    path = constants.CASES_PATH
+    if path == 'None' or path is None:
+        logger.error('path is empty, please add the cases dir to CASES_PATH')
+    else:
+        dates = get_case_dates(path)
+        db = Database()
+        db.init_collection()
+        for date in dates:
+            db.update_status(date, StatusType.DONE)
 
 
 def create_docs(dates):
@@ -34,7 +39,6 @@ def create_docs(dates):
 
 
 class Database:
-    logger = Logger('db.log', constants.LOG_DIR).get_logger()
 
     def __init__(self):
         self.client = MongoClient(constants.DB_URI)
@@ -45,32 +49,32 @@ class Database:
 
     def get_connection(self):
         try:
-            self.logger.info('db trying to connect...')
+            logger.info('db trying to connect...')
             connection = self.client
-            self.logger.info('db connected')
+            logger.info('db connected')
         except ServerSelectionTimeoutError as err:
             message = 'db connection Timeout - check for if this machine ip is on whitelist'
-            if self.logger is not None:
-                self.logger.exception(f'{message} {err}')
+            if logger is not None:
+                logger.exception(f'{message} {err}')
             else:
                 print(f'{message} {err}')
             connection = None
         return connection
 
     def get_db(self, name):
-        self.logger.info(f'db trying to get db: {name}')
+        logger.info(f'db trying to get db: {name}')
         db = self.client[name]
-        self.logger.info(f'got db: {db.name}')
+        logger.info(f'got db: {db.name}')
         return db
 
     def get_collection(self, db, collection_name):
         collection = db.get_collection(collection_name)
-        self.logger.info(f'got collection: {collection_name}')
+        logger.info(f'got collection: {collection_name}')
         return collection
 
     # date format: %d-%m-%Y
     def update_status(self, date, status):
-        self.logger.info(f'setting {date} status to: {status.value}')
+        logger.info(f'setting {date} status to: {status.value}')
         self.collection.update_one({
             'date': date
         }, {
@@ -86,7 +90,7 @@ class Database:
             '_id': 0,
             'status': 0
         })
-        self.logger.info(f'found {res.count()} dates')
+        logger.info(f'found {res.count()} dates')
         return res
 
     def get_latest_db_date(self):
@@ -100,17 +104,17 @@ class Database:
 
     def init_collection(self):
         if self.collection.count() == 0:
-            self.logger.info(f'initializing collection: {self.collection_name}')
+            logger.info(f'initializing collection: {self.collection_name}')
             self.insert_new_dates(init_dates())
-            self.logger.info(f'collection @{self.collection_name} initialized')
+            logger.info(f'collection @{self.collection_name} initialized')
         else:
-            self.logger.info(f'checking gap dates in collection: {self.collection_name}')
+            logger.info(f'checking gap dates in collection: {self.collection_name}')
             latest_db_date = self.get_latest_db_date()
             gap_dates = get_gap_dates(latest_db_date)
             if len(gap_dates) != 0:
-                self.logger.info(f'updating dates in collection: {self.collection_name}')
+                logger.info(f'updating dates in collection: {self.collection_name}')
                 self.insert_new_dates(gap_dates)
-                self.logger.info(f'collection @{self.collection_name} was updated')
+                logger.info(f'collection @{self.collection_name} was updated')
             else:
-                self.logger.info(f'collection @{self.collection_name} is up to date')
+                logger.info(f'collection @{self.collection_name} is up to date')
         return self.collection
