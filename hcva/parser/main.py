@@ -5,7 +5,7 @@ from hcva.utils.logger import Logger
 from hcva.utils.json import read_data, save_data
 from hcva.utils.path import create_dir
 from hcva.utils.time import call_sleep
-logger = Logger('parser/main.log', constants.LOG_DIR).get_logger()
+logger = Logger('parser_main.log', constants.LOG_DIR).get_logger()
 
 
 def clean_spaces(text):

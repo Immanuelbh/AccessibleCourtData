@@ -9,7 +9,7 @@ from hcva.utils.json import save_data, read_data
 from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.path import create_dir
-logger = Logger('elastic/v7/main.log', constants.LOG_DIR).get_logger()
+logger = Logger('elastic_v7_main.log', constants.LOG_DIR).get_logger()
 
 sys.path.insert(1, '../../..')
 

@@ -16,6 +16,7 @@ class StatusType(Enum):
 def sync_existing_cases():
     dates = get_case_dates(constants.CASES_PATH)
     db = Database()
+    db.init_collection()
     for date in dates:
         db.update_status(date, StatusType.DONE)
 
@@ -25,7 +26,7 @@ def create_docs(dates):
     for date in dates:
         doc = {
             'date': date,
-            'status': StatusType.AVAILABLE
+            'status': StatusType.AVAILABLE.value
         }
         docs.append(doc)
 
@@ -69,24 +70,18 @@ class Database:
 
     # date format: %d-%m-%Y
     def update_status(self, date, status):
-        self.logger.info(f'setting {date} status to: {status}')
+        self.logger.info(f'setting {date} status to: {status.value}')
         self.collection.update_one({
             'date': date
         }, {
             '$set': {
-                'status': status
+                'status': status.value
             }
-        })
-
-    def create_date(self, date):
-        self.collection.insert({
-            'date': date,
-            'status': StatusType.AVAILABLE
         })
 
     def get_dates(self):
         res = self.collection.find({
-            'status': {'$in': [StatusType.AVAILABLE, StatusType.ERROR]}
+            'status': {'$in': [StatusType.AVAILABLE.value, StatusType.ERROR.value]}
         }, {
             '_id': 0,
             'status': 0

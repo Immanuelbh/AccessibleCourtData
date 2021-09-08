@@ -7,7 +7,7 @@ from hcva.utils.logger import Logger
 from hcva.utils.path import create_dir
 from hcva.utils.time import call_sleep
 
-logger = Logger('scraper/main.log', constants.LOG_DIR).get_logger()
+logger = Logger('scraper_main.log', constants.LOG_DIR).get_logger()
 db = Database()
 
 
