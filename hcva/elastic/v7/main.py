@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-
+import jsonschema
 import logging
 from elasticsearch import Elasticsearch, TransportError
 from hcva.elastic.validation.schema_validation import validate_schema
@@ -12,14 +12,9 @@ from hcva.utils.logger import Logger
 from hcva.utils.time import call_sleep
 from hcva.utils.path import create_dir
 logger = Logger('elastic_v7_main.log', constants.LOG_DIR, log_level=logging.INFO).get_logger()
+SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/schema/schema_v7.json'
 
 sys.path.insert(1, '../../..')
-
-
-def save(files, directory):
-    for file in files:
-        data = read_data(file, constants.PARSED_SUCCESS_DIR)
-        save_data(data, file, directory)
 
 
 def build_elasticsearch_id(json_id):
@@ -39,13 +34,25 @@ def build_first_continuous_number(initial_id):
     return f"{initial_id}-{first_continuous_number}"
 
 
+def validate_schema(case_data):
+    try:
+        with open(SCHEMA, encoding='utf-8') as json_schema:
+            schema = json.load(json_schema)
+        return bool(jsonschema.validate(case_data, schema) is None)
+    except Exception as e:
+        print(f'failed to open files, {e}')
+        return False
+
+
+def extract_id(case_data):
+    json_id = case_data['Doc Details']['מספר הליך']
+    return build_elasticsearch_id(json_id=json_id)
+
+
 class Elastic:
-    failed_upload = []
-    failed_validation = []
-    success_upload = []
     index_exists = False
 
-    def __init__(self, logger):
+    def __init__(self):
         self._logger = logger
         self.elastic = Elasticsearch()
         create_dir(constants.ELASTIC_SUCCESS_DIR)
@@ -77,44 +84,36 @@ class Elastic:
         self._logger.info(f'trying to upload {len(cases)} cases')
         self.push_cases(cases)
 
-    def save_all(self):
-        self._logger.info("saving results")
-        save(self.success_upload, constants.ELASTIC_SUCCESS_DIR)
-        save(self.failed_upload, constants.ELASTIC_FAILED_UPLOAD_DIR)
-        save(self.failed_validation, constants.ELASTIC_FAILED_VALIDATION_DIR)
-        self._logger.info("all files saved")
-
     def push_cases(self, cases):
         for case in cases:
             file_name = os.path.basename(case)
             self._logger.info(f'trying to validate {file_name}')
-            if validate_schema(data_file=case):
+            case_data = self.get_case_data(file_name)
+            if case_data and validate_schema(case_data):
                 self._logger.info("file is valid")
-                id_, data = self.extract_data(case)
-                res = self.upload(id_, data)
+                id_ = extract_id(case_data)
+                res = self.upload(id_, case_data)
                 if res:
                     self._logger.info(f'{case} was uploaded to elasticsearch successfully')
-                    self.success_upload.append(file_name)
+                    save_data(case_data, case, constants.ELASTIC_SUCCESS_DIR)
                 else:
-                    self._logger.info("adding file to failed list")
-                    self.failed_upload.append(file_name)
+                    self._logger.error("failed to upload file")
+                    save_data(case_data, case, constants.ELASTIC_FAILED_UPLOAD_DIR)
                     # TODO add retry
             else:
-                self._logger.info("file is not valid")
-                self.failed_validation.append(file_name)
+                self._logger.error("file is not valid")
+                save_data(case_data, case, constants.ELASTIC_FAILED_VALIDATION_DIR)
 
-    def extract_data(self, case):
-        self._logger.info("extracting data from file")
-        with open(case, encoding='utf-8') as json_file:
+    def get_case_data(self, file_name):
+        self._logger.info("getting case data from file")
+        with open(file_name, encoding='utf-8') as json_file:
             try:
                 json_data = json.load(json_file)
                 self._logger.info("file loaded successfully")
-                json_id = json_data['Doc Details']['מספר הליך']  # Take procedure number from json file
-                elasticsearch_id = build_elasticsearch_id(json_id=json_id)
-                return elasticsearch_id, json_data
+                return json_data
             except Exception as e:
-                self._logger.info(f"error while trying to load file, {e}")
-                return None, None
+                self._logger.error(f"error while trying to load file, {e}")
+                return None
 
     def upload(self, id_, data):
         self._logger.info("trying to upload file to elasticsearch")
@@ -127,14 +126,13 @@ class Elastic:
 
 
 def elastic():
-    e = Elastic(logger)
+    e = Elastic()
     index_created = e.init_index()
     if index_created:
         logger.info(f"{constants.ELASTIC_INDEX_NAME} index created successfully")
         while True:
             logger.info("elastic starting")
             e.run()
-            e.save_all()
             logger.info("elastic has finished")
             call_sleep(logger=logger, days=1)
 
