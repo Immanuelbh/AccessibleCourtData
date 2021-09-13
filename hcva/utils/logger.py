@@ -5,8 +5,8 @@ from hcva.utils.path import create_dir
 
 class Logger:
 
-    def __init__(self, log_name, log_path, logger=None):
-        self.logger = self.start_logger(log_name, log_path, logger)
+    def __init__(self, log_name, log_path, log_level=logging.ERROR, logger=None):
+        self.logger = self.start_logger(log_name, log_path, log_level, logger)
 
     def get_logger(self):
         return self.logger
@@ -15,13 +15,13 @@ class Logger:
     # output - logger as logging class
     # do - set logger settings
     @staticmethod
-    def start_logger(log_name, log_path, logger=None):
+    def start_logger(log_name, log_path, log_level, logger=None):
         path = log_path if log_path is not None else ""
         name = log_name if log_name is not None else "NoName.log"
         new_logger = logging.getLogger(log_name) if logger is None else logger
         create_dir(path)
 
-        # new_logger.setLevel(logging.DEBUG) # add for debugging
+        new_logger.setLevel(log_level or logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d-%m-%Y %H-%M-%S')
 
         stream_handler = logging.StreamHandler()

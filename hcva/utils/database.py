@@ -1,3 +1,4 @@
+import logging
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from hcva.utils.case_utils import get_case_dates
@@ -5,7 +6,7 @@ from hcva.utils.date import init_dates, get_gap_dates
 from hcva.utils.logger import Logger
 from hcva.utils import constants
 from enum import Enum
-logger = Logger('db.log', constants.LOG_DIR).get_logger()
+logger = Logger('db.log', constants.LOG_DIR, log_level=logging.INFO).get_logger()
 
 
 class StatusType(Enum):
