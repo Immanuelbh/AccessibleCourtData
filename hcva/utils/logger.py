@@ -21,7 +21,7 @@ class Logger:
         new_logger = logging.getLogger(log_name) if logger is None else logger
         create_dir(path)
 
-        new_logger.setLevel(logging.DEBUG)
+        # new_logger.setLevel(logging.DEBUG) # add for debugging
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s: %(message)s', datefmt='%d-%m-%Y %H-%M-%S')
 
         stream_handler = logging.StreamHandler()
