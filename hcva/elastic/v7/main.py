@@ -88,21 +88,21 @@ class Elastic:
         for case in cases:
             file_name = os.path.basename(case)
             self._logger.info(f'trying to validate {file_name}')
-            case_data = self.get_case_data(file_name)
+            case_data = self.get_case_data(case)
             if case_data and validate_schema(case_data):
-                self._logger.info("file is valid")
+                self._logger.info(f'file {file_name} is valid')
                 id_ = extract_id(case_data)
                 res = self.upload(id_, case_data)
                 if res:
-                    self._logger.info(f'{case} was uploaded to elasticsearch successfully')
-                    save_data(case_data, case, constants.ELASTIC_SUCCESS_DIR)
+                    self._logger.info(f'{file_name} was uploaded to elasticsearch successfully')
+                    save_data(case_data, file_name, constants.ELASTIC_SUCCESS_DIR)
                 else:
-                    self._logger.error("failed to upload file")
-                    save_data(case_data, case, constants.ELASTIC_FAILED_UPLOAD_DIR)
+                    self._logger.error(f'failed to upload file {file_name}')
+                    save_data(case_data, file_name, constants.ELASTIC_FAILED_UPLOAD_DIR)
                     # TODO add retry
             else:
-                self._logger.error("file is not valid")
-                save_data(case_data, case, constants.ELASTIC_FAILED_VALIDATION_DIR)
+                self._logger.error(f'file {file_name} is not valid')
+                save_data(case_data, file_name, constants.ELASTIC_FAILED_VALIDATION_DIR)
 
     def get_case_data(self, file_name):
         self._logger.info("getting case data from file")
