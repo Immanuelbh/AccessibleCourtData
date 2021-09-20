@@ -59,6 +59,27 @@ class Elastic:
         create_dir(constants.ELASTIC_FAILED_UPLOAD_DIR)
         create_dir(constants.ELASTIC_FAILED_VALIDATION_DIR)
 
+    def create_id(self, case_data):
+        id_ = extract_id(case_data)
+        ids = self.get_ids(id_)
+        if len(ids) == 0:
+            return f'{id_}-1'
+        return self.update_id(ids)
+
+    def get_ids(self, id_):
+        return self.elastic.get(index=constants.ELASTIC_INDEX_NAME, id=f'{id_}*')
+
+    def update_id(self, ids):
+        latest_number = self.get_latest_number(ids)
+        return f'{int(latest_number)+1}'
+
+    def get_latest_number(self, ids):
+        num_list = []
+        for i in ids:
+            num_list.append(i.split('-')[2])
+        num_list.sort(key=int, reverse=True)
+        return ids[0]
+
     def init_index(self):
         self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX_NAME}")
         index = read_data('', constants.ELASTIC_INDEX_PATH)
@@ -91,7 +112,7 @@ class Elastic:
             case_data = self.get_case_data(case)
             if case_data and validate_schema(case_data):
                 self._logger.info(f'file {file_name} is valid')
-                id_ = extract_id(case_data)
+                id_ = create_id(case_data)
                 res = self.upload(id_, case_data)
                 if res:
                     self._logger.info(f'{file_name} was uploaded to elasticsearch successfully')

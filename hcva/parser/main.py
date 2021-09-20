@@ -250,7 +250,7 @@ def parse(case):
     return None
 
 
-def is_valid(logger, case):
+def is_valid(case):
     if len(case) < 1:
         logger.error('length is 0')
         return False
@@ -269,7 +269,7 @@ def parser_flow(parsed):
     return p
 
 
-def run(logger, cases):
+def run(cases):
     if not cases:
         logger.info('no cases to parse')
         return
@@ -278,7 +278,7 @@ def run(logger, cases):
     for case in cases:
         logger.info(f'trying to parse {case}...')
         c = read_data(case, constants.SCRAPED_DIR)
-        if c and is_valid(logger, c):
+        if c and is_valid(c):
             logger.info(f'read {case} successfully')
             p = parse(c)
             if p:
@@ -304,6 +304,6 @@ def parser():
     while True:
         logger.info("parser is starting")
         cases = get_cases(constants.SCRAPED_DIR)
-        run(logger, cases)
+        run(cases)
         logger.info("parser has finished")
         call_sleep(logger=logger, days=1)
