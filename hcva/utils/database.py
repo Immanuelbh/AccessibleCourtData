@@ -55,10 +55,7 @@ class Database:
             logger.info('db connected')
         except ServerSelectionTimeoutError as err:
             message = 'db connection Timeout - check for if this machine ip is on whitelist'
-            if logger is not None:
-                logger.exception(f'{message} {err}')
-            else:
-                print(f'{message} {err}')
+            logger.exception(f'{message} {err}')
             connection = None
         return connection
 
