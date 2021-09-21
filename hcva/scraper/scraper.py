@@ -18,7 +18,7 @@ def get_frame(crawler, elem_type, string):
     if frame is not None:
         return crawler.switch_frame(frame)
 
-    print(f'could not switch to frame: {string}')
+    logger.error(f'could not switch to frame: {string}')
     return False
 
 
@@ -33,9 +33,9 @@ def get_num_cases(crawler):
             text = crawler.get_text_query(update)
             if text is not None and len(text) > 0:
                 count_cases = [int(s) for s in text.split() if s.isdigit()][0]
-                print(f'this page got {count_cases} cases')
+                logger.error(f'this page got {count_cases} cases')
                 return count_cases
-    print('could not get this page amount of cases')
+    logger.error('could not get this page amount of cases')
     return 0
 
 def get_string_by_index(xpath, index):
@@ -69,9 +69,9 @@ def scroll_into_view(crawler, num):
             elem = get_elem(crawler, 'שם', index)
             result = crawler.scroll_to_elem(elem)
         if result:
-            print('scrolled to elem')
+            logger.info('scrolled to elem')
         else:
-            print('could not scrolled to case')
+            logger.error('could not scrolled to case')
 
 
 def get_case(crawler, index):
@@ -82,11 +82,11 @@ def get_case(crawler, index):
         if elem is not None:
             update = crawler.read_elem_text(elem)
             res[key] = crawler.get_text_query(update)
-            print(f'got {key}: {res[key]}')
+            logger.info(f'got {key}: {res[key]}')
             if key == 'שם':
                 crawler.click_elem(elem)
         else:
-            print(f'did not found {key}')
+            logger.error(f'did not found {key}')
     return res
 
 
@@ -106,10 +106,10 @@ def get_doc(crawler):
 def is_blocked_case(crawler):
     elem = crawler.find_elem('xpath', '/html/body/table/tbody/tr[1]/td/b', raise_error=False)
     if elem is not None:
-        print('this case in a private !!!')
+        logger.error('this case in a private !!!')
         result = False
     else:
-        print('this case in not private - we can get more info')
+        logger.info('this case in not private - we can get more info')
         result = True
     return result
 
@@ -210,9 +210,9 @@ def get_case_inside_details(crawler):
                 headline = crawler.get_text_query(update)
                 crawler.click_elem(elem)
                 table[headline] = get_column_text(crawler, index)
-                print('got info from column number: {}'.format(index))
+                logger.info('got info from column number: {}'.format(index))
             else:
-                print('could not get text or press column number: {}'.format(index))
+                logger.error('could not get text or press column number: {}'.format(index))
     return table
 
 

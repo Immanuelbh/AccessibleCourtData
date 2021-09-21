@@ -29,7 +29,7 @@ def validate_schema(case_data):
             schema = json.load(json_schema)
         return bool(jsonschema.validate(case_data, schema) is None)
     except Exception as e:
-        print(f'failed to open files, {e}')
+        logger.error(f'failed to open files, {e}')
         return False
 
 
