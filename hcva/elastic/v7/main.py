@@ -17,21 +17,10 @@ SCHEMA = constants.ROOT_DIR + '/hcva/elastic/validation/schema/schema_v7.json'
 sys.path.insert(1, '../../..')
 
 
-def build_elasticsearch_id(json_id):
-    initial_id = build_an_initial_id(json_id)
-    elasticsearch_id = build_first_continuous_number(initial_id)
-    return elasticsearch_id
-
-
-def build_an_initial_id(json_id):
+def format_id(json_id):
     initial_id = json_id.split(" ")[1]  # Acceptance only of procedure number without court type
     initial_id = initial_id.replace("/", "-")  # Change the procedure number format from 'xxxx/xx' to 'xxxx-xx'
     return initial_id
-
-
-def build_first_continuous_number(initial_id):
-    first_continuous_number = 1  # Set an initial runner number to a procedure number
-    return f"{initial_id}-{first_continuous_number}"
 
 
 def validate_schema(case_data):
@@ -46,7 +35,16 @@ def validate_schema(case_data):
 
 def extract_id(case_data):
     json_id = case_data['Doc Details']['מספר הליך']
-    return build_elasticsearch_id(json_id=json_id)
+    return format_id(json_id)
+
+
+def get_date(file_name):
+    return file_name.split('__')[0]
+
+
+def create_id(date, case_data):
+    extracted_id = extract_id(case_data)
+    return f'{extracted_id}-{date}'
 
 
 class Elastic:
@@ -59,26 +57,8 @@ class Elastic:
         create_dir(constants.ELASTIC_FAILED_UPLOAD_DIR)
         create_dir(constants.ELASTIC_FAILED_VALIDATION_DIR)
 
-    def create_id(self, case_data):
-        id_ = extract_id(case_data)
-        ids = self.get_ids(id_)
-        if len(ids) == 0:
-            return f'{id_}-1'
-        return self.update_id(ids)
-
-    def get_ids(self, id_):
-        return self.elastic.get(index=constants.ELASTIC_INDEX_NAME, id=f'{id_}*')
-
-    def update_id(self, ids):
-        latest_number = self.get_latest_number(ids)
-        return f'{int(latest_number)+1}'
-
-    def get_latest_number(self, ids):
-        num_list = []
-        for i in ids:
-            num_list.append(i.split('-')[2])
-        num_list.sort(key=int, reverse=True)
-        return ids[0]
+    def id_exists(self, id_):
+        return self.elastic.exists(index=constants.ELASTIC_INDEX_NAME, id=id_, ignore=404)
 
     def init_index(self):
         self._logger.info(f"initializing elasticsearch index :: {constants.ELASTIC_INDEX_NAME}")
@@ -112,15 +92,18 @@ class Elastic:
             case_data = self.get_case_data(case)
             if case_data and validate_schema(case_data):
                 self._logger.info(f'file {file_name} is valid')
-                id_ = create_id(case_data)
-                res = self.upload(id_, case_data)
-                if res:
-                    self._logger.info(f'{file_name} was uploaded to elasticsearch successfully')
-                    save_data(case_data, file_name, constants.ELASTIC_SUCCESS_DIR)
+                date = get_date(file_name)
+                id_ = create_id(date, case_data)
+                if self.id_exists(id_) is False:
+                    res = self.upload(id_, case_data)
+                    if res:
+                        self._logger.info(f'{file_name} was uploaded to elasticsearch successfully')
+                        save_data(case_data, file_name, constants.ELASTIC_SUCCESS_DIR)
+                    else:
+                        self._logger.error(f'failed to upload file {file_name}')
+                        save_data(case_data, file_name, constants.ELASTIC_FAILED_UPLOAD_DIR)
                 else:
-                    self._logger.error(f'failed to upload file {file_name}')
-                    save_data(case_data, file_name, constants.ELASTIC_FAILED_UPLOAD_DIR)
-                    # TODO add retry
+                    self._logger.info(f'{file_name} already exists in elasticsearch')
             else:
                 self._logger.error(f'file {file_name} is not valid')
                 save_data(case_data, file_name, constants.ELASTIC_FAILED_VALIDATION_DIR)
