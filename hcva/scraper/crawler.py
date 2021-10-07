@@ -212,7 +212,7 @@ class Crawler:
             return None
         finally:
             if raise_error is False:
-                self._logger.error(message)
+                self._logger.info(message)
 
     # input - driver as web driver, elem as web element
     # output - return True if successful, otherwise False
