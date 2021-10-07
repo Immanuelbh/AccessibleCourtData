@@ -13,7 +13,7 @@ elasticsearch==7.12.1
 entrypoints==0.3
 future==0.17.1
 hypothesis==5.5.5
-git+https://github.com/io-commits/hcva-ml.git@connect#egg=hcvaEnricher
+git+https://github.com/io-commits/hcva-ml.git@master#egg=hcvaEnricher
 idna==2.9
 importlib-metadata==1.6.0
 isort==5.8.0
