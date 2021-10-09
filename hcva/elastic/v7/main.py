@@ -52,7 +52,7 @@ class Elastic:
 
     def __init__(self):
         self._logger = logger
-        self.elastic = Elasticsearch()
+        self.elastic = Elasticsearch(timeout=30, max_retries=10, retry_on_timeout=True)
         create_dir(constants.ELASTIC_SUCCESS_DIR)
         create_dir(constants.ELASTIC_FAILED_UPLOAD_DIR)
         create_dir(constants.ELASTIC_FAILED_VALIDATION_DIR)
