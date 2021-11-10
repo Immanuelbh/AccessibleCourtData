@@ -39,11 +39,11 @@ def clean_spaces(text):
     return "".join(temp_list)  # rejoin the set of characters
 
 
-def make_sure_no_number(line, minimum=1, maximum=200):
-    for number in range(minimum, maximum):
-        if str(number) in line:
-            line = line.replace(str(number), '')
-    return clean_spaces(line)
+def remove_digits(line):
+    if line:
+        line = ''.join([i for i in line if not i.isdigit()])
+        return clean_spaces(line)
+    return ''
 
 
 def drop_extra_info(text, minimum=1, maximum=5):
@@ -96,7 +96,7 @@ def is_there_more(line, old_values=None, key=';'):
 
 
 def get_key(temp_key):
-    temp_key = make_sure_no_number(temp_key)
+    temp_key = remove_digits(temp_key)
     temp_dict = {
         'לפני': ['לפני', 'בפני'],
         'בשם העותר': ['בשם המערערים', 'בשם המערער', 'בשם המערערת', 'בשם המערערות',
