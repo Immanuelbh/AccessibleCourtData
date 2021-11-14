@@ -186,19 +186,19 @@ class Crawler:
             self._logger.info(message)
             return elem
 
-        except TimeoutException as _:  # did not found elem in time
+        except TimeoutException as te:  # did not found elem in time
             if raise_error:
-                self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time')
+                self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time', te)
             return None
 
-        except ElementNotVisibleException as _:  # did not found elem
+        except ElementNotVisibleException as enve:  # did not found elem
             if raise_error:
-                self._logger.error(f'Elem is not visible: {string}, type: {elem_type}')
+                self._logger.error(f'Elem is not visible: {string}, type: {elem_type}', enve)
             return None
 
-        except NoSuchElementException as _:  # did not found elem
+        except NoSuchElementException as nse:  # did not found elem
             if raise_error:
-                self._logger.error(f'No Such elem: {string}, type: {elem_type}')
+                self._logger.error(f'No Such elem: {string}, type: {elem_type}', nse)
             return None
         finally:
             if raise_error is False:
@@ -214,8 +214,8 @@ class Crawler:
             self._logger.info('elem got hovered')
             return True
 
-        except Exception as _:
-            self._logger.error('Could not hover that')
+        except Exception as e:
+            self._logger.error('Could not hover that', e)
             return False
 
     # input - elem as web element, value as string, msg as string
@@ -248,12 +248,12 @@ class Crawler:
             self._logger.info(message)
             return True
 
-        except ElementClickInterceptedException as _:
-            self._logger.error('Element Click Intercepted')
+        except ElementClickInterceptedException as ecie:
+            self._logger.error('Element Click Intercepted', ecie)
             return False
 
-        except ElementNotInteractableException as _:
-            self._logger.error('Element Not Interactable')
+        except ElementNotInteractableException as enie:
+            self._logger.error('Element Not Interactable', enie)
             return False
 
     # input - elem as web element, data as string
@@ -270,8 +270,8 @@ class Crawler:
             self._logger.info(message)
             return True
 
-        except Exception as _:
-            self._logger.error('Could not send elem this data')
+        except Exception as e:
+            self._logger.error('Could not send elem this data', e)
             return False
 
     # input - elem as web element
@@ -307,8 +307,8 @@ class Crawler:
             self._logger.info('Script executed')
             return True
 
-        except JavascriptException as _:
-            self._logger.error('Could not execute script')
+        except JavascriptException as je:
+            self._logger.error('Could not execute script', je)
             return False
 
     # input - result as string
@@ -332,6 +332,6 @@ class Crawler:
             self._logger.info(f'Alert say: {text}')
             return True
 
-        except NoAlertPresentException as _:
-            self._logger.error('Did not find any alert')
+        except NoAlertPresentException as nape:
+            self._logger.error('Did not find any alert', nape)
             return False
