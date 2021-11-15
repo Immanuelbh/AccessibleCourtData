@@ -123,7 +123,7 @@ class Crawler:
 
     # input - elem_type as string, string as string
     # output - return element if found in <delay> seconds, None otherwise
-    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=2, raise_error=True):
+    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=4, raise_error=True):
         driver = self._driver if driver is None else driver
         message = ''
         try:

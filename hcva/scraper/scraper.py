@@ -27,7 +27,7 @@ def get_num_cases(crawler):
     crawler.switch_to_default_content()
     get_frame(crawler, 'id', 'serviceFram')
     for location in case_num_loc:
-        elem = crawler.find_elem('xpath', location, delay=8)
+        elem = crawler.find_elem('xpath', location, delay=15)
         if elem is not None:
             update = crawler.read_elem_text(elem)
             text = crawler.get_text_query(update)
@@ -35,7 +35,10 @@ def get_num_cases(crawler):
                 count_cases = [int(s) for s in text.split() if s.isdigit()][0]
                 logger.error(f'this page got {count_cases} cases')
                 return count_cases
-    logger.error('could not get this page amount of cases')
+            else:
+                logger.error('no text found - skipping current date')
+        else:
+            logger.error('could not find element - skipping current date')
     return 0
 
 def get_string_by_index(xpath, index):
@@ -86,7 +89,7 @@ def get_case(crawler, index):
             if key == 'שם':
                 crawler.click_elem(elem)
         else:
-            logger.error(f'did not found {key}')
+            logger.error(f'could not find key "{key}"')
     return res
 
 
@@ -106,7 +109,7 @@ def get_doc(crawler):
 def is_blocked_case(crawler):
     elem = crawler.find_elem('xpath', '/html/body/table/tbody/tr[1]/td/b', raise_error=False)
     if elem is not None:
-        logger.error('this case in a private !!!')
+        logger.error('current case is private - skipping scrape')
         result = False
     else:
         logger.info('this case in not private - we can get more info')
