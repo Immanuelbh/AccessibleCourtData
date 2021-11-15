@@ -123,7 +123,7 @@ class Crawler:
 
     # input - elem_type as string, string as string
     # output - return element if found in <delay> seconds, None otherwise
-    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=2, raise_error=True):
+    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=4, raise_error=True):
         driver = self._driver if driver is None else driver
         message = ''
         try:
@@ -187,8 +187,7 @@ class Crawler:
             return elem
 
         except TimeoutException as te:  # did not found elem in time
-            if raise_error:
-                self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time', te)
+            self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time. error: ', te)
             return None
 
         except ElementNotVisibleException as enve:  # did not found elem
