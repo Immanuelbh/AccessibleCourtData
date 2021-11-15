@@ -187,8 +187,7 @@ class Crawler:
             return elem
 
         except TimeoutException as te:  # did not found elem in time
-            if raise_error:
-                self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time', te)
+            self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time. error: ', te)
             return None
 
         except ElementNotVisibleException as enve:  # did not found elem
