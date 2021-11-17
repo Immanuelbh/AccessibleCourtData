@@ -65,7 +65,7 @@ class Crawler:
 
             return webdriver.Firefox(firefox_options=options, executable_path=driver_prefix+driver_postfix)
         else:
-            self._logger.error(f'browser type is invalid: ${browser}')
+            self._logger.error(f'browser type is invalid: {browser}')
 
     # input - update as boolean
     # output - return string if true, else None
@@ -121,87 +121,58 @@ class Crawler:
         self._logger.info('Got page Source')
         return page_source
 
+    def find_by_type(self, elem_type, string, wait):
+        elem = None
+        if elem_type == 'xpath':
+            wait.until(EC.presence_of_element_located((By.XPATH, string)))
+            elem = self._driver.find_element_by_xpath(string)
+        elif elem_type == 'id':
+            wait.until(EC.presence_of_element_located((By.ID, string)))
+            elem = self._driver.find_element_by_id(string)
+        elif elem_type == 'tag':
+            wait.until(EC.presence_of_element_located((By.TAG_NAME, string)))
+            elem = self._driver.find_element_by_tag_name(string)
+        elif elem_type == 'name':
+            wait.until(EC.presence_of_element_located((By.NAME, string)))
+            elem = self._driver.find_element_by_name(string)
+        elif elem_type == 'link_text':
+            wait.until(EC.presence_of_element_located((By.LINK_TEXT, string)))
+            elem = self._driver.find_element_by_link_text(string)
+        elif elem_type == 'partial_link_text':
+            wait.until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, string)))
+            elem = self._driver.find_element_by_partial_link_text(string)
+        elif elem_type == 'css':
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, string)))
+            elem = self._driver.find_element_by_css_selector(string)
+        elif elem_type == 'class_name':
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, string)))
+            elem = self._driver.find_element_by_class_name(string)
+        else:
+            self._logger.error(f'find_elem:: no type: {elem_type}')
+        return elem
+
     # input - elem_type as string, string as string
     # output - return element if found in <delay> seconds, None otherwise
-    def find_elem(self, elem_type, string, single_element=True, driver=None, delay=4, raise_error=True):
-        driver = self._driver if driver is None else driver
-        message = ''
+    def find_elem(self, elem_type, string, delay=6, raise_error=True):
+        self._logger.info(f'find_elem:: type: {elem_type}, string: {string}')
         try:
-            elem = None
-            message = f'found elem: {string}, type: {elem_type}'
-            if single_element:
-                if elem_type == 'xpath':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, string)))
-                    elem = driver.find_element_by_xpath(string)
-                elif elem_type == 'id':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, string)))
-                    elem = driver.find_element_by_id(string)
-                elif elem_type == 'tag':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.TAG_NAME, string)))
-                    elem = driver.find_element_by_tag_name(string)
-                elif elem_type == 'name':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.NAME, string)))
-                    elem = driver.find_element_by_name(string)
-                elif elem_type == 'link_text':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.LINK_TEXT, string)))
-                    elem = driver.find_element_by_link_text(string)
-                elif elem_type == 'partial_link_text':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, string)))
-                    elem = driver.find_element_by_partial_link_text(string)
-                elif elem_type == 'css':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, string)))
-                    elem = driver.find_element_by_css_selector(string)
-                elif elem_type == 'class_name':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, string)))
-                    elem = driver.find_element_by_class_name(string)
-                else:
-                    message = f'find_element function do not have: {elem_type}'
-            else:
-                if elem_type == 'xpath':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, string)))
-                    elem = driver.find_elements_by_xpath(string)
-                elif elem_type == 'id':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, string)))
-                    elem = driver.find_elements_by_id(string)
-                elif elem_type == 'tag':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.TAG_NAME, string)))
-                    elem = driver.find_elements_by_tag_name(string)
-                elif elem_type == 'name':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.NAME, string)))
-                    elem = driver.find_elements_by_name(string)
-                elif elem_type == 'link_text':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.LINK_TEXT, string)))
-                    elem = driver.find_elements_by_link_text(string)
-                elif elem_type == 'partial_link_text':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, string)))
-                    elem = driver.find_elements_by_partial_link_text(string)
-                elif elem_type == 'css':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, string)))
-                    elem = driver.find_elements_by_css_selector(string)
-                elif elem_type == 'class_name':
-                    WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, string)))
-                    elem = driver.find_elements_by_class_name(string)
-                else:
-                    message = f'find_element function do not have: {elem_type}'
-            self._logger.info(message)
+            wait = WebDriverWait(self._driver, delay)
+            elem = self.find_by_type(elem_type, string, wait)
             return elem
 
-        except TimeoutException as te:  # did not found elem in time
-            self._logger.error(f'Did not find elem: {string}, type: {elem_type}, delay: {delay} in time. error: ', te)
+        except TimeoutException as te:
+            self._logger.error(f'TimeoutException:: Did not find elem: {string}, type: {elem_type}, delay: {delay}', te)
             return None
 
-        except ElementNotVisibleException as enve:  # did not found elem
+        except ElementNotVisibleException as enve:
             if raise_error:
-                self._logger.error(f'Elem is not visible: {string}, type: {elem_type}', enve)
+                self._logger.error(f'ElementNotVisibleException:: {string}, type: {elem_type}', enve)
             return None
 
-        except NoSuchElementException as nse:  # did not found elem
+        except NoSuchElementException as nse:
             if raise_error:
-                self._logger.error(f'No Such elem: {string}, type: {elem_type}', nse)
+                self._logger.error(f'NoSuchElementException:: {string}, type: {elem_type}', nse)
             return None
-        finally:
-            if raise_error is False:
-                self._logger.info(message)
 
     # input - driver as web driver, elem as web element
     # output - return True if successful, otherwise False
