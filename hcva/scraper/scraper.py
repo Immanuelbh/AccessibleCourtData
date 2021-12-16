@@ -190,7 +190,7 @@ def get_column_text(crawler, index):
 
     string = get_string_by_index('inside column', index)
     elem = crawler.find_elem('xpath', string)
-    call_sleep(seconds=1)
+    call_sleep(seconds=4)
 
     if index == 1:
         func = get_general_details

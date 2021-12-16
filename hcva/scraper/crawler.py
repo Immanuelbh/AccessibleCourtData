@@ -28,7 +28,6 @@ def get_os_type():
 
 class Crawler:
     _driver = None  # Web Driver
-    _delay = 2  # Timer for finding web element as int
     _url = None  # starting page as string
     _text_query = None  # latest text get as string
     _logger = None  # logging log class
@@ -153,7 +152,7 @@ class Crawler:
 
     # input - elem_type as string, string as string
     # output - return element if found in <delay> seconds, None otherwise
-    def find_elem(self, elem_type, string, delay=6, raise_error=True):
+    def find_elem(self, elem_type, string, delay=10, raise_error=True):
         self._logger.info(f'find_elem:: type: {elem_type}, string: {string}')
         try:
             wait = WebDriverWait(self._driver, delay)
